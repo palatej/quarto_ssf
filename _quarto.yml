@@ -1,0 +1,37 @@
+project:
+  type: book
+
+book:
+  title: "Quarto-SSF"
+  author: "Jean Palate"
+  date: "02/1/2026"
+  chapters:
+    - index.qmd
+    - summary.qmd
+    - references.qmd
+    - part: intro.qmd
+      chapters:
+        - overview.qmd
+        - design.qmd
+        - ssf_structure.qmd
+        - java_design.qmd
+    - part: ssf_blocks.qmd
+      chapters: 
+        - atomic_ssf.qmd
+        - derived_ssf.qmd
+    - part: ssf_algorithms.qmd
+      chapters: 
+        - algorithms_ordinary.qmd
+        - algorithms_dk.qmd
+        - algorithms_array.qmd
+        - algorithms_chandrasekhar.qmd
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+editor: visual
+

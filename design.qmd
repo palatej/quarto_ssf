@@ -1,0 +1,53 @@
+# Design
+
+## Functional forms
+
+State space forms and the related algorithms focus on the state vectors and their (conditional) distribution, and on the relationships between those vectors at different time points. For instance, using obvious notations, we will consider:
+
+| Operations       | Formulae                                           |
+|------------------|----------------------------------------------------|
+| Initialization   | $a_0 = a_{0\vert -1}$                              |
+| Prediction       | $a_{t \vert t}\rightarrow a_{t+1 \vert t}=a_{t+1}$ |
+| Update           | $a_{t \vert t-1}=a_t \rightarrow a_{t \vert t}$    |
+| Prediction error | $e_t=y_t- \hat y_{t \vert t-1}$                    |
+| Smoothing        | $a_{t \vert n} \rightarrow a_{t-1\vert n}$         |
+| …                | ...                                                |
+
+The relationships considered above are usually expressed under the form of matrices, which are often sparse. All things considered, matrices are only a convenient way for describing linear transformations. By replacing matrix computations (at least the most frequent and/or the most expansive ones) with equivalent functions, it is possible to achieve substantial performance gain.
+
+This is the basic principle of the JD+ state space framework: every type of model will have to provide a set of functions that allows an efficient computation of the different algorithms considered in the framework.
+
+We shall clarify that point by an example. The prediction step is defined by the equations:
+
+$$ a_{t+1 \vert t}=T_t a_{t \vert t}, \quad P_{t+1 \vert t}=T_t P_{t \vert t} T_t'+V_t=T_t \left(T_t P_{t \vert t} \right)'+V_t $$
+
+The transformation $f_{T_t} (x)$ of an array (and by extension, of a matrix) by means of the matrix $T_t$ plays thus a central role in the forecasting step:
+
+-   Apply $f_{T_t}$ on $a$
+-   Apply $f_{T_t}$ on each column of $P$ ; we get $Q$
+-   Apply $f_{T_t}$ on each row of $Q$ ; we get $O$
+-   Add $V_t$ to $O$
+
+In the case of (partially) time invariant systems, we will usually omit in the documentation of the framework the subscript $_t$ of the different arrays/matrices/functions.
+
+Using matrix computation, the transformation $f_{T_t}$ needs $r \times r$ multiplications, where $r$ is the length of the state array. In many cases, the functional form will involve at most $r$ multiplications and much less memory traffic.
+
+For instance, in some SSF forms of ARIMA models (see Gomez-Maravall, 1994), the function $y=f_T(x)$ is defined by
+
+$$ y_i = \begin{cases} x_{i+1} & 0 \le i < r-1  \\ -\sum_{k=1}^p {\varphi_k x_{r-k} } & i =r-1\end{cases} $$
+
+which corresponds to the transformation matrix
+
+$$
+\begin{pmatrix}
+0 & 1 & 0 & \cdots & 0 \\
+0 & 0 & 1 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \ddots & 0 \\
+0 & \cdots & \cdots & 0 & 1 \\
+0 & \cdots & -\phi_p & - \cdots & -\phi_1
+\end{pmatrix}
+$$
+
+It involves only $p$ (order of the autoregressive polynomial) multiplications.
+
+As soon as direct matrix computations are avoided, the matrices of the system themselves don’t usually need to be created. That leads to another substantial gain in time and in memory space/traffic, especially in the case of time dependent systems.
