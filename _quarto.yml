@@ -23,8 +23,10 @@ book:
       chapters: 
         - algorithms_ordinary.qmd
         - algorithms_dk.qmd
+        - algorithms_akf.qmd
         - algorithms_array.qmd
         - algorithms_chandrasekhar.qmd
+        - algorithms_likelihood.qmd
 bibliography: references.bib
 
 format:

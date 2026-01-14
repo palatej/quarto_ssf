@@ -59,7 +59,7 @@ $$ \Omega\left(i,j\right) = \Omega\left(i-1,j-1\right)-\psi_i \psi_j $$
 
 ### Representation II
 
-We provide below an alternative state space representation as follows
+We provide below an alternative state space representation of ARMA models
 
 #### State vector:
 
@@ -135,7 +135,7 @@ $$ S_t = \begin{pmatrix}\sigma_{t+1}\\ \sigma_{t+1} \theta_{t+2,1} \\ \vdots\\ \
 
 $$ V_t = S S' $$
 
-### Measurement
+### Default measurement
 
 $$ Z_t = \begin{pmatrix} 1 & 0 & \cdots & 0\end{pmatrix}$$
 
@@ -190,9 +190,136 @@ $$\Lambda \left(i,j\right) = -\sum_{k=1}^d {\delta_k \Lambda \left(i-k,j\right)}
 
 ## Noise
 
+### State vector
+
+### Dynamics
+
+### Default measurement
+
+### Initialization
+
+### Implementation
+
 ## Local level
 
+#### Description
+
+The local level block describes a random walk component.
+
+$$
+\begin{align*}
+l_{t+1} &= l_t + \epsilon_t \\
+\epsilon_t &\sim N(0, \sigma^2_l)
+\end{align*}
+$$
+
+### State vector
+
+The state block is $\alpha_t=\begin{pmatrix} l_t  \end{pmatrix}$
+
+### Dynamics
+
+$$
+\begin{align*}
+T_t &= \begin{pmatrix} 1 \end{pmatrix} \\
+V_t &= \begin{pmatrix}\sigma^2_l \end{pmatrix}\\
+S_t &= \begin{pmatrix}\sigma_l \end{pmatrix}
+\end{align*}
+$$
+
+### Default measurement
+
+$$
+\begin{align*}
+Z_t &= \begin{pmatrix} 1 \end{pmatrix} \end{align*} 
+$$
+
+### Diffuse initialization
+
+$$
+\begin{align*}
+a_0 &= \begin{pmatrix} 0 \end{pmatrix} \\
+P_* &= \begin{pmatrix} 0 \end{pmatrix}\\
+B &= \begin{pmatrix} 1 \end{pmatrix} \\
+P_\infty &= \begin{pmatrix} 1 \end{pmatrix}
+\end{align*}
+$$
+
+### Fixed initialization
+
+$$
+\begin{align*}
+a_0 &= \begin{pmatrix} l_0 \end{pmatrix} \\
+P_* &= \begin{pmatrix} \sigma_{l} \end{pmatrix}\\
+B &= \begin{pmatrix} 0 \end{pmatrix} \\
+P_\infty &= \begin{pmatrix} 0 \end{pmatrix}
+\end{align*}
+$$
+
+### Implementation
+
+See `jdplus.toolkit.base.core.ssf.sts.LocalLevel`
+
 ## Local linear trend
+
+### Description
+
+The local linear trend block describes the following trend component:
+
+$$
+\begin{align*}
+l_{t+1} &= l_t + n_t +  \epsilon_t \\
+n_{t+1} &= n_t + \mu_t \\
+\epsilon_t &\sim N(0, \sigma^2_l) \\
+\mu_t &\sim N(0, \sigma^2_n)
+\end{align*}
+$$
+
+### State vector
+
+The state block is
+
+$$\alpha_t=
+\begin{pmatrix} 
+l_t \\ 
+n_t  
+\end{pmatrix}
+$$ \### Dynamics
+
+$$
+\begin{align*}
+T_t &= \begin{pmatrix} 1 && 1 \\ 0 && 1 \end{pmatrix} \\
+V_t &= \begin{pmatrix} \sigma^2_l && 0 \\ 0 && \sigma^2_n \end{pmatrix} \\
+S_t &= \begin{pmatrix} \sigma_l && 0 \\ 0 && \sigma_n \end{pmatrix} 
+\end{align*}
+$$
+
+### Default measurement
+
+$$
+\begin{align*}
+Z_t &= \begin{pmatrix} 1 & 0 \end{pmatrix} 
+\end{align*} 
+$$
+
+### Initialization
+
+$$
+\begin{align*}
+a_0 &= \begin{pmatrix} 0 \\ 0  \end{pmatrix} \\
+P_* &=  \begin{pmatrix} 0 && 0 \\ 0 && 0 \end{pmatrix}\\
+B &= \begin{pmatrix} 1 && 0 \\ 0 && 1 \end{pmatrix} \\
+P_{\infty} &= \begin{pmatrix} 1 && 0 \\ 0 && 1 \end{pmatrix}
+\end{align*}
+$$
+
+### Parameters
+
+$$ \sigma^2_l \ge 0,\quad \sigma^2_n \ge 0 $$
+
+### Implementation
+
+See `jdplus.toolkit.base.core.ssf.sts.LocalLinearTrend`
 
 ## Seasonal component
 
@@ -265,6 +392,9 @@ $$ h_t = 0 $$
 
 ### Initialization
 
-$$ \a_{-1} = \begin{pmatrix}0 \\ 0 \end{pmatrix} $$
-
-$$ P_{*} =  \sigma_c^2\begin{pmatrix} \frac{1}{1-\rho^2} && 0\\  0  && \frac{1}{1-\rho^2}\end {pmatrix} $$
+$$
+\begin{align*}
+a_0 &= \begin{pmatrix}0 \\ 0 \end{pmatrix} \\
+P_{*} &=  \sigma_c^2\begin{pmatrix} \frac{1}{1-\rho^2} && 0\\  0  && \frac{1}{1-\rho^2}\end {pmatrix}
+\end{align*}
+$$
