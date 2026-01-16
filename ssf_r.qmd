@@ -1,0 +1,34 @@
+---
+title: "R implementation"
+---
+
+```{r echo=FALSE}
+suppressPackageStartupMessages(library(rjd3sts))
+
+```
+
+## Examples
+
+### Atomic blocks
+
+#### ARMA models
+
+```{r}
+
+```
+
+### Models
+
+#### Basic structural model
+```{r}
+s<-rjd3toolkit::ABS$X0.2.20.10.M
+model<-rjd3sts::model()
+llt<-locallineartrend("llt")
+seas<-seasonal("seas", period=frequency(s), type="HarrisonStevens")
+noise<-noise("n", fixed = TRUE)
+add(model, llt)
+add(model, seas)
+add(model, noise)
+rslt<-estimate(model, log(s))
+  
+```

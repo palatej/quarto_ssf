@@ -1,4 +1,6 @@
-# Atomic blocks
+---
+title: "Atomic blocks"
+--- 
 
 ## ARMA model
 
@@ -39,7 +41,7 @@ $$ S_t = \begin{pmatrix}1 \\ \psi_1 \\ \vdots\\ \psi_s \end{pmatrix} $$
 
 $$ V_t = S S' $$
 
-#### Measurement
+#### Default measurement
 
 $$ Z_t = \begin{pmatrix} 1 & 0 & \cdots & 0\end{pmatrix}$$
 
@@ -80,7 +82,7 @@ $$ S_t = \begin{pmatrix}1 \\ \theta_1 \\ \vdots\\ \theta_r \end{pmatrix} $$
 
 $$ V_t = S S' $$
 
-#### Measurement
+#### Default measurement
 
 $$ Z_t = \begin{pmatrix} 1 & 0 & \cdots & 0\end{pmatrix}$$
 
@@ -97,6 +99,7 @@ $\Omega$ is the unconditional covariance of the state array; it can be easily de
 $$ \Omega\left(i,0\right) = \gamma_i $$
 
 $$ \Omega\left(i,j\right) = \Omega\left(i-1,j-1\right)-\psi_i \psi_j $$
+### Implementation
 
 ## Time dependent ARMA model
 

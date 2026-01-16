@@ -227,8 +227,7 @@
 
 \part{Introduction}
 
-\chapter{Overview of the state space framework of
-JD+}\label{overview-of-the-state-space-framework-of-jd}
+\chapter{Overview}\label{overview}
 
 \section{Description of the general
 model}\label{description-of-the-general-model}
@@ -249,7 +248,7 @@ observations. However, in most cases, we will use the univariate
 approach by considering the observations one by one (univariate handling
 of multi-variate models).
 
-The innovations of the state equation will be modelled as
+The innovations of the state equation will be modeled as
 
 \[ \mu_t = S_t \xi_t, \quad \xi_t \sim N\left( 0, \sigma^2 I\right) \]
 
@@ -258,41 +257,78 @@ In other words, \(V_t=S_t S_t'\)
 The initial (\(\equiv t=0\)) conditions of the filter are defined as
 follows:
 
-\[ \alpha_{0} = a_{0} + B\delta + \mu_{0}, \quad \delta \sim N\left(0, \kappa I \right),\: \mu_{0} \sim N\left(0, P_*\right)\]
+\[ \alpha_{0} = b + B\delta + \mu_{0}\]
 
-where \(\kappa\) is arbitrary large. \(P_*\) is the variance of the
-stationary part of the initial state vector and \(B\) models the diffuse
-part. We write \(BB'=P_\infty\).
+\(\delta\) is unknown or
+\(\delta \sim N\left(0, \kappa \sigma^2 I \right)\), where \(\kappa\) is
+arbitrary large. \(\mu_{0} \sim N\left(0, \sigma^2 P_*\right)\). So,
+\(P_*\) is the variance of the stationary part of the initial state
+vector and \(B\), which must be a full rank matrix, models the diffuse
+part. We write \(BB'=P_\infty\). It should be noted that applying an
+orthogonal transformation to \(B\) or multiplying it by a constant will
+give exactly the same initialization. Moreover, when the initial state
+is completely diffuse, \(\mu_0\) is not relevant and it can be safely
+considered as \(0\). Finally, it should be noted that imposing that the
+covariance of \(\delta\) is proportional to \(I\) is not an actual
+restriction: in the hypothesis of a more general non singular matrix, we
+just should pre-multiply \(\delta\) by the inverse of the Cholesky
+factor of that matrix and post-multiply \(B\) by that factor to get an
+equivalent initialization.
 
 The definition used in JD+ is quasi-identical to that of Durbin and
 Koopman{[}1{]}.
 
-In summary, the model is completely defined by the following quantities
-(possible default values are indicated in brackets):
+In summary, apart from the scaling factor \(\sigma^2\) which can be
+given or estimated, the model is completely defined by the following
+quantities (possible default values are indicated in brackets):
 
 \[ \mathbf{Z_t}, \mathbf{H_t} [=0] \]
 
 \[ \mathbf{T_t}, \mathbf{V_t} [=S_t S_t'], \mathbf{S_t} [=Cholesky(V)] \]
 
-\[ \mathbf{a_{0}}[=0], \mathbf{P_*} [=0], \mathbf{B} [=0], \mathbf{P_\infty} [=BB'] \]
+\[ \mathbf{b}[=0], \mathbf{P_*} [=0], \mathbf{B} [=0], \mathbf{P_\infty} [=BB'] \]
 
-\section{Other notations}\label{other-notations}
-
-The following notations are used in all the pages related to the ssf
-framework:
+It should be noted that all the indexes of arrays or matrices start at
+\(0\) (Java and C++ convention). The following notations are also used
+in all the pages related to the ssf framework:
 
 \[ a_{t+k|t}=E\left(\alpha_{t+k} | y_0 \cdots y_{t}\right)\]
 
 \[ P_{t+k|t}=cov\left(\alpha_{t+k} | y_0 \cdots y_{t}\right)\]
 
-\[ a_{t+1}=a_{t+1|t}, \: P_{t+1}=P_{t+1|t} \]
+\[ a_{t+1}=a_{t+1|t}, \: P_{t+1}=P_{t+1|t} \] \[ 
+\begin{align*}
+y_t - E(y_t| y_0 \cdots y_t-1) &= e_t \\
+var(e_t) &= f_t \\
+\end{align*}
+\] or, in the multivariate case
 
-Finally, it should be noted that all the indexes of arrays or matrices
-start at 0 (Java and C++ convention).
+\[ 
+var(e_t) = F_t = R_t R_t'
+\]
 
-\chapter{Functional forms}\label{functional-forms}
+\section{Algorithms}\label{algorithms}
 
-\section{Functional forms}\label{functional-forms-1}
+State space models are convenient representations of time series to
+derive multiple properties. Algorithms has been developed around them
+for likelihood evaluation (and so, for parameters estimation), for
+filtering/forecasting, for smoothing/missing values estimation, for
+simulation\ldots{}
+
+Multiple variations of those algorithms have been developed, to favor
+either speed, memory use, robustness or accuracy.
+
+The JD+ framework provides several family of those algorithms, mainly
+based on approaches developed by Durbin-Koopman (DK), De Jong (AKF or
+Augmented Kalman Filter), Kailath (Array filters) or Chandrasekhar
+filters (CKMS or Chandrasekhar-Kailath-Morf-Sidhu). They will be
+described in the chapter 3.
+
+\section{Design}\label{design}
+
+\chapter{Design}\label{design-1}
+
+\section{Functional forms}\label{functional-forms}
 
 State space forms and the related algorithms focus on the state vectors
 and their (conditional) distribution, and on the relationships between
@@ -391,7 +427,717 @@ in the case of time dependent systems.
 
 \chapter{Java design}\label{java-design}
 
-test
+\part{SSF blocks}
+
+\chapter{Atomic blocks}\label{atomic-blocks}
+
+\section{ARMA model}\label{arma-model}
+
+\subsection{Introduction}\label{introduction-1}
+
+The ARMA process is defined by
+
+\[\Phi\left(B\right)y_t=\Theta\left(B\right)\epsilon_t \]
+
+where:
+
+\[\Phi\left(B\right)=1+\varphi_1 B + \cdots + \varphi_p B^p \]
+
+\[\Theta\left(B\right)=1+\theta_1 B + \cdots + \theta_q B^q \]
+
+are the auto-regressive and the moving average polynomials.
+
+The MA representation of the model is
+\(y_t=\sum_{i=0}^\infty {\psi_i \epsilon_{t-i}}\). Let \(\gamma_i\) be
+the autocovariances of the model. We also define:
+\(r=\max\left(p, q+1\right), \quad s=r-1\).
+
+The state-space model can be written in different ways. JD+ provides two
+of them
+
+\subsection{Representation I}\label{representation-i}
+
+\subsubsection{State vector}\label{state-vector}
+
+\[ \alpha_t= \begin{pmatrix} y_t \\ y_{t+1|t} \\ \vdots \\ y_{t+s|t} \end{pmatrix}\]
+
+where \(y_{t+i|t}\) is the orthogonal projection of \(y_{t+i}\) on the
+subspace generated by \({y\left(s\right):s \leq t}\).Thus, it is the
+forecast function with respect to the semi-infinite sample. We also have
+that \(y_{t+i|t} = \sum_{j=i}^\infty {\psi_j \epsilon_{t+i-j}}\)
+
+\subsubsection{Dynamics}\label{dynamics}
+
+\[ T_t = \begin{pmatrix}0 &1 & 0 & \cdots & 0  \\0& 0 & 1 & \cdots & 0\\ \vdots & \vdots & \vdots & \ddots & \vdots\\ 0 & 0 & 0 & \cdots & 1\\
+-\varphi_r & \cdots  & \cdots & \cdots &-\varphi_1 \end{pmatrix}\]
+
+with \(\varphi_{j}=0\) for \(j>p\)
+
+\[ S_t = \begin{pmatrix}1 \\ \psi_1 \\ \vdots\\ \psi_s \end{pmatrix} \]
+
+\[ V_t = S S' \]
+
+\subsubsection{Default measurement}\label{default-measurement}
+
+\[ Z_t = \begin{pmatrix} 1 & 0 & \cdots & 0\end{pmatrix}\]
+
+\[ h_t = 0 \]
+
+\subsubsection{Initialization}\label{initialization}
+
+\[ \alpha_{-1} = \begin{pmatrix}0 \\ 0 \\ \vdots\\ 0 \end{pmatrix} \]
+
+\[ P_{*} = \Omega \]
+
+\(\Omega\) is the unconditional covariance of the state array; it can be
+easily derived using the MA representation. We have:
+
+\[ \Omega\left(i,0\right) = \gamma_i \]
+
+\[ \Omega\left(i,j\right) = \Omega\left(i-1,j-1\right)-\psi_i \psi_j \]
+
+\subsection{Representation II}\label{representation-ii}
+
+We provide below an alternative state space representation of ARMA
+models
+
+\subsubsection{State vector:}\label{state-vector-1}
+
+\[ \alpha_t= \begin{pmatrix} y_t \\ 
+-\varphi_2 y_{t-1}-\dots-\varphi_r y_{t-r+1}+\theta_1 \epsilon_t+ \dots + \theta_{r-1} \epsilon_{t-r+2}\\ -\varphi_3 y_{t-1}-\dots-\varphi_r y_{t-r+2}+\theta_2 \epsilon_t+ \dots + \theta_{r-1} \epsilon_{t-r+3}\\ \vdots \\ 
+-\varphi_r y_{t-1}+\theta_{r-1} \epsilon_{t}
+\end{pmatrix}\]
+
+\subsubsection{Dynamics}\label{dynamics-1}
+
+\[ T_t = \begin{pmatrix}-\varphi_1 &1 & 0 & \cdots & 0  \\
+-\varphi_2& 0 & 1 & \cdots & 0\\ 
+\vdots & \vdots & \vdots & \ddots & \vdots\\ 
+\vdots & 0 & 0 & \cdots & 1\\
+-\varphi_r & 0  & \cdots & \cdots &0 \end{pmatrix}\]
+
+\[ S_t = \begin{pmatrix}1 \\ \theta_1 \\ \vdots\\ \theta_r \end{pmatrix} \]
+
+\[ V_t = S S' \]
+
+\subsubsection{Default measurement}\label{default-measurement-1}
+
+\[ Z_t = \begin{pmatrix} 1 & 0 & \cdots & 0\end{pmatrix}\]
+
+\[ h_t = 0 \]
+
+\subsubsection{Initialization}\label{initialization-1}
+
+\[ \alpha_{-1} = \begin{pmatrix}0 \\ 0 \\ \vdots\\ 0 \end{pmatrix} \]
+
+\[ P_{*} = \Omega \]
+
+\(\Omega\) is the unconditional covariance of the state array; it can be
+easily derived using the MA representation. We have:
+
+\[ \Omega\left(i,0\right) = \gamma_i \]
+
+\[ \Omega\left(i,j\right) = \Omega\left(i-1,j-1\right)-\psi_i \psi_j \]
+\#\#\# Implementation
+
+\section{Time dependent ARMA model}\label{time-dependent-arma-model}
+
+\subsection{Introduction}\label{introduction-2}
+
+The time dependent ARMA process (TDARMA) is defined by
+
+\[ \Phi_t\left(B\right)y_t=\Theta_t\left(B\right)\epsilon_t \]
+
+where:
+
+\[\Phi_t\left(B\right)=1+\varphi_{t,1} B + \cdots + \varphi_{t,p} B^p \]
+
+\[\Theta_t\left(B\right)=1+\theta_{t,1} B + \cdots + \theta_{t,q} B^q \]
+
+are the time dependent auto-regressive and the moving average
+polynomials.
+
+\subsection{State vector:}\label{state-vector-2}
+
+\[ \alpha_t= \begin{pmatrix} y_t \\ 
+-\varphi_{t+1,2} y_{t-1}-\dots-\varphi_{t+1,r} y_{t-r+1}+\theta_{t+1,1} \epsilon_t+ \dots + \theta_{t+1, r-1} \epsilon_{t-r+2}\\ -\varphi_{t+2,3} y_{t-1}-\dots-\varphi_{t+2,r} y_{t-r+2}+\theta_{t+2,2 }\epsilon_t+ \dots + \theta_{t+2,r-1} \epsilon_{t-r+3}\\ \vdots \\ 
+-\varphi_{t+r-1,r} y_{t-1}+\theta_{t+r-1,r-1} \epsilon_{t}
+\end{pmatrix}\]
+
+\subsection{Dynamics}\label{dynamics-2}
+
+\[ \alpha_{t+1} = T_t \alpha_t + \begin{pmatrix} 1 \\ \theta_{t+2,1} \\ \theta_{t+3,2} \\ \vdots \\  \theta_{t+r, r-1} \\ \end{pmatrix} \epsilon_{t+1} \]
+
+\[ T_t = \begin{pmatrix}-\varphi_{t+1,1} &1 & 0 & \cdots & 0  \\
+-\varphi_{t+2,2} & 0 & 1 & \cdots & 0\\ 
+\vdots & \vdots & \vdots & \ddots & \vdots\\ 
+\vdots & 0 & 0 & \cdots & 1\\
+-\varphi_{t+r,r} & 0  & \cdots & \cdots &0 \end{pmatrix}\]
+
+\[ S_t = \begin{pmatrix}\sigma_{t+1}\\ \sigma_{t+1} \theta_{t+2,1} \\ \vdots\\ \sigma_{t+1} \theta_{t+r,r-1} \end{pmatrix} \]
+
+\[ V_t = S S' \]
+
+\subsection{Default measurement}\label{default-measurement-2}
+
+\[ Z_t = \begin{pmatrix} 1 & 0 & \cdots & 0\end{pmatrix}\]
+
+\[ h_t = 0 \]
+
+\subsection{Initialization}\label{initialization-2}
+
+\[ \alpha_0= \begin{pmatrix} y_0 \\ 
+-\varphi_{1,2} y_{-1}-\dots-\varphi_{1,r} y_{-r+1}+\theta_{1,1} \epsilon_0+ \dots + \theta_{1, r-1} \epsilon_{-r+2}\\ -\varphi_{2,3} y_{-1}-\dots-\varphi_{2,r} y_{-r+2}+\theta_{2,2 }\epsilon_0+ \dots + \theta_{2,r-1} \epsilon_{-r+3}\\ \vdots \\ 
+-\varphi_{r-1,r} y_{-1}+\theta_{r-1,r-1} \epsilon_{0}
+\end{pmatrix}\]
+
+The covariance of \(\alpha_0\) can be easily computed, taking into
+account that \(y_0, \dots,y_{r-1}\) and
+\(\epsilon_0, \dots, \epsilon_{r-1}\) are generated by the same
+processes and that their variances/covariances are:
+
+\[ cov(y_i, y_j)=\gamma(i-j)\]
+
+\[ cov(y_i, \epsilon_j) = \psi_{j-i}\sigma^2, j\le i\]
+
+\[ cov(\epsilon_i, \epsilon_j)=\sigma^2, i=j \]
+
+\section{ARIMA model}\label{arima-model}
+
+\subsection{Introduction}\label{introduction-3}
+
+We consider that the auto-regressive polynomial contains some unit
+roots. It can be factorized in a stationary polynomial (defined by the
+roots outside the unit circle) and in a non-stationary polynomial
+(defined by the roots on the unit circle), which is notated:
+
+\[ \Delta\left(B\right) = 1 + \delta_1 B + \cdots + \delta_d B^d \]
+
+The state space form of an ARIMA model is similar to the state space
+form of an ARMA model, except for its initialization.
+
+\subsection{Initialization}\label{initialization-3}
+
+The initial conditions can be written as follows:
+
+\[ \alpha_{-1} = \begin{pmatrix}1 \\ 0 \\ \vdots\\ 0 \end{pmatrix} \]
+
+\[ P_{*} = \Sigma \Omega \Sigma' \]
+
+\[ B = \Lambda \]
+
+\[ P_{\infty}= \Lambda \Lambda' \]
+
+\(\Omega\) is the unconditional covariance of the state array of the
+stationary model.
+
+\[ \Sigma = \begin{pmatrix} 1 & 0 & \cdots & 0 \\ \lambda_1 & 1 & \cdots & 0 \\ \lambda_2 & \lambda_1 & \cdots & \vdots\\ \vdots & \vdots & \vdots & \vdots \\ \lambda_{r-1} & \lambda_{r-2} & \cdots & \lambda_{1} \end{pmatrix} \]
+
+where \(\lambda_{i}\) are generated by
+\(\frac{1}{\Delta\left(B\right)}\)
+
+\(\Lambda\) is a r x d matrix; its first d rows form an identity matrix;
+other cells are defined by the recursive relationship:
+
+\[\Lambda \left(i,j\right) = -\sum_{k=1}^d {\delta_k \Lambda \left(i-k,j\right)}\]
+
+\section{Noise}\label{noise}
+
+\subsection{State vector}\label{state-vector-3}
+
+\subsection{Dynamics}\label{dynamics-3}
+
+\subsection{Default measurement}\label{default-measurement-3}
+
+\subsection{Initialization}\label{initialization-4}
+
+\subsection{Implementation}\label{implementation}
+
+\section{Local level}\label{local-level}
+
+\subsubsection{Description}\label{description}
+
+The local level block describes a random walk component.
+
+\[
+\begin{align*}
+l_{t+1} &= l_t + \epsilon_t \\
+\epsilon_t &\sim N(0, \sigma^2_l)
+\end{align*}
+\]
+
+\subsection{State vector}\label{state-vector-4}
+
+The state block is \(\alpha_t=\begin{pmatrix} l_t  \end{pmatrix}\)
+
+\subsection{Dynamics}\label{dynamics-4}
+
+\[
+\begin{align*}
+T_t &= \begin{pmatrix} 1 \end{pmatrix} \\
+V_t &= \begin{pmatrix}\sigma^2_l \end{pmatrix}\\
+S_t &= \begin{pmatrix}\sigma_l \end{pmatrix}
+\end{align*}
+\]
+
+\subsection{Default measurement}\label{default-measurement-4}
+
+\[
+\begin{align*}
+Z_t &= \begin{pmatrix} 1 \end{pmatrix} \end{align*} 
+\]
+
+\subsection{Diffuse initialization}\label{diffuse-initialization}
+
+\[
+\begin{align*}
+a_0 &= \begin{pmatrix} 0 \end{pmatrix} \\
+P_* &= \begin{pmatrix} 0 \end{pmatrix}\\
+B &= \begin{pmatrix} 1 \end{pmatrix} \\
+P_\infty &= \begin{pmatrix} 1 \end{pmatrix}
+\end{align*}
+\]
+
+\subsection{Fixed initialization}\label{fixed-initialization}
+
+\[
+\begin{align*}
+a_0 &= \begin{pmatrix} l_0 \end{pmatrix} \\
+P_* &= \begin{pmatrix} \sigma_{l} \end{pmatrix}\\
+B &= \begin{pmatrix} 0 \end{pmatrix} \\
+P_\infty &= \begin{pmatrix} 0 \end{pmatrix}
+\end{align*}
+\]
+
+\subsection{Implementation}\label{implementation-1}
+
+See \texttt{jdplus.toolkit.base.core.ssf.sts.LocalLevel}
+
+\section{Local linear trend}\label{local-linear-trend}
+
+\subsection{Description}\label{description-1}
+
+The local linear trend block describes the following trend component:
+
+\[
+\begin{align*}
+l_{t+1} &= l_t + n_t +  \epsilon_t \\
+n_{t+1} &= n_t + \mu_t \\
+\epsilon_t &\sim N(0, \sigma^2_l) \\
+\mu_t &\sim N(0, \sigma^2_n)
+\end{align*}
+\]
+
+\subsection{State vector}\label{state-vector-5}
+
+The state block is
+
+\[\alpha_t=
+\begin{pmatrix} 
+l_t \\ 
+n_t  
+\end{pmatrix}
+\] \#\#\# Dynamics
+
+\[
+\begin{align*}
+T_t &= \begin{pmatrix} 1 && 1 \\ 0 && 1 \end{pmatrix} \\
+V_t &= \begin{pmatrix} \sigma^2_l && 0 \\ 0 && \sigma^2_n \end{pmatrix} \\
+S_t &= \begin{pmatrix} \sigma_l && 0 \\ 0 && \sigma_n \end{pmatrix} 
+\end{align*}
+\]
+
+\subsection{Default measurement}\label{default-measurement-5}
+
+\[
+\begin{align*}
+Z_t &= \begin{pmatrix} 1 & 0 \end{pmatrix} 
+\end{align*} 
+\]
+
+\subsection{Initialization}\label{initialization-5}
+
+\[
+\begin{align*}
+a_0 &= \begin{pmatrix} 0 \\ 0  \end{pmatrix} \\
+P_* &=  \begin{pmatrix} 0 && 0 \\ 0 && 0 \end{pmatrix}\\
+B &= \begin{pmatrix} 1 && 0 \\ 0 && 1 \end{pmatrix} \\
+P_{\infty} &= \begin{pmatrix} 1 && 0 \\ 0 && 1 \end{pmatrix}
+\end{align*}
+\]
+
+\subsection{Parameters}\label{parameters}
+
+\[ \sigma^2_l \ge 0,\quad \sigma^2_n \ge 0 \]
+
+\subsection{Implementation}\label{implementation-2}
+
+See \texttt{jdplus.toolkit.base.core.ssf.sts.LocalLinearTrend}
+
+\section{Seasonal component}\label{seasonal-component}
+
+\subsection{Introduction}\label{introduction-4}
+
+The seasonal component provided in JD+ is based on Proietti{[}2000{]}
+
+We consider that it is composed of latent variables corresponding to
+each period, which follow a multivariate random walk. We also impose
+that the sum of the latent variables is 0 at each point time.
+
+\subsection{State vector}\label{state-vector-6}
+
+For a periodicity of \(s\), we define the state space form of the
+seasonal component as follows (West-Harrison form):
+
+We consider first the state vector \(\tilde \gamma_t\) such that
+\(\tilde \gamma_{it}\) is the (unobserved) seasonal component of season
+\(i\) observed at time \(t\).
+
+Using that definition would imply a time varying measurement error. To
+avoid it, we use the state vector \(\gamma_t\) which is a rotation of
+\(\tilde \gamma_t\) such that the first component corresponds to the
+current period. More precisely,
+\(\gamma_{it} =\tilde\gamma_{\left( \left(t-i\right) \mod s \right), t}\).
+
+Moreover, the constraint that the sum of the latent variables is 0
+allows us to consider only \(s-1\) periods (the missing one being the
+opposite of the sum of all the other periods).
+
+\subsection{Dynamics}\label{dynamics-5}
+
+\[ T_t = \begin{pmatrix} 0 & 1 & \cdots & 0 \\ \vdots & \ddots & \ddots & \vdots \\ 0 &  \cdots & 0 & 1  \\ -1 & -1 & \cdots & -1\end{pmatrix}\]
+
+The covariance matrix of the innovations can take various form. Using
+the terminology of Proietti, we consider:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Model
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+V
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+S
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Dummy &
+\(\begin{pmatrix} 0 &  \cdots & 0 \\ \vdots & & \vdots\\ 0 &\cdots &\sigma_{seas}^2\end{pmatrix}\)
+& \(\begin{pmatrix}0 \\ \vdots \\ \sigma_{seas}\end{pmatrix}\) \\
+Crude &
+\(\sigma_{seas}^2\begin{pmatrix} 1 &  \cdots & 1 \\ \vdots & & \vdots\\ 1 &\cdots & 1\end{pmatrix}\)
+& \(\sigma_{seas}\begin{pmatrix}1 \\ \vdots \\ 1\end{pmatrix}\) \\
+HarrisonStevens & \(\sigma\_{seas}\^2\) & \\
+Trigonometric & & \\
+\end{longtable}
+
+\subsection{Measurement}\label{measurement}
+
+\[ Z_t = \begin{pmatrix} 1 & 0 & \cdots & 0\end{pmatrix}\]
+
+\subsection{Bibliography}\label{bibliography}
+
+Proietti T. (2000), ``Comparing seasonal components for structural time
+series models'', International Journal of Forecasting, 16, 2, 247-260.
+
+\section{Cyclical component}\label{cyclical-component}
+
+\subsection{Introduction}\label{introduction-5}
+
+A Cycle component is a special case of an AR2 component, which contains
+two complex conjugate roots.
+
+More precisely, it is defined by a period \(\lambda\) and a dumping
+factor \(\rho\). If \(\gamma = \frac{2\pi}{\lambda}\), we have that
+
+\[   \begin{pmatrix} y_{t+1} \\ y^*_{t+1}\end {pmatrix} = \begin{pmatrix} \rho \cos{\gamma} &&   \rho \sin{\gamma}\\  -\rho \sin{\gamma}  && \rho \cos{\gamma}\end {pmatrix}\begin{pmatrix} y_t \\ y_t^*\end {pmatrix}+\begin{pmatrix} \epsilon_t \\ \epsilon_t^*\end {pmatrix} \]
+
+Using those notations, the state-space model can be written as follows :
+
+\subsection{State vector:}\label{state-vector-7}
+
+\[ \alpha_t= \begin{pmatrix} y_t \\ y_t^* \end{pmatrix}\]
+
+\subsection{Dynamics}\label{dynamics-6}
+
+\[ T_t = \begin{pmatrix} \rho \cos{\gamma} &&   \rho \sin{\gamma}\\  -\rho \sin{\gamma}  && \rho \cos{\gamma}\end {pmatrix}\]
+
+\[ S_t = \sigma_c \begin{pmatrix} 1 && 0\\  0  && 1\end {pmatrix} \]
+
+\[ V_t = \sigma_c^2\begin{pmatrix} 1 && 0\\  0  && 1\end {pmatrix} \]
+
+\subsection{Measurement}\label{measurement-1}
+
+\[ Z_t = \begin{pmatrix} 1 & 0 \end{pmatrix}\]
+
+\[ h_t = 0 \]
+
+\subsection{Initialization}\label{initialization-6}
+
+\[
+\begin{align*}
+a_0 &= \begin{pmatrix}0 \\ 0 \end{pmatrix} \\
+P_{*} &=  \sigma_c^2\begin{pmatrix} \frac{1}{1-\rho^2} && 0\\  0  && \frac{1}{1-\rho^2}\end {pmatrix}
+\end{align*}
+\]
+
+\chapter{Derived blocks}\label{derived-blocks}
+
+\part{Algorithms}
+
+\chapter{Ordinary filters}\label{ordinary-filters}
+
+\section{Filters}\label{filters}
+
+\subsection{Univariate model}\label{univariate-model}
+
+\subsubsection{Update step t}\label{update-step-t}
+
+\[
+\begin{align*}
+e_t &= y_t - Z_t a_t \\
+M_t &= P_t Z_t' \\
+f_t &= Z_t P_t Z_t' +h_t = M_tZ_t' + h_t \\
+a_{t|t} &= a_t + M_t f_t^{-1}e_t \\
+P_{t|t}&= P_t - M_t f_t^{-1} M_t'
+\end{align*}
+\]
+
+\subsubsection{Forecast step t}\label{forecast-step-t}
+
+\[
+\begin{align*}
+a_{t+1} &= T_t a_{t|t} \\
+P_{t+1} &= T_t P_{t|t} T_t' + V_t
+\end{align*}
+\]
+
+\subsubsection{Compact form}\label{compact-form}
+
+The two steps can be easily combined to give a more compact formulation.
+
+\[
+\begin{align*}
+e_t &= y_t - Z_t a_t \\
+f_t &= Z_t P_t Z_t' + h_t \\
+K_t &= T_t P_t Z_t' f_t^{-1} \\
+a_{t+1} &= T_t a_t + K_t e_t \\
+P_{t+1} &= T_t P_t T_t' - K_t f_t K_t' + V_t
+\end{align*}
+\]
+
+However, the current implementation uses explicitly the two steps form,
+to be able to store either \(a_t\) and \(a_{t|t}\).
+
+\subsection{Multivariate model}\label{multivariate-model}
+
+In the multi-variate case, we use a slightly different (but strictly
+equivalent) implementation:
+
+\subsubsection{Update step t}\label{update-step-t-1}
+
+\[
+\begin{align*}
+e_t &= y_t - Z_t a_t \\
+F_t &= Z_t P_t Z_t' + H_t = R_t R_t' \quad(Cholesky) \\
+\tilde{K_t} &= P_t Z_t' {R_t'}^{-1} \Leftrightarrow \tilde{K_t} R_t' = P_t Z_t' \\
+u_t &= R_t^{-1} e_t \Leftrightarrow R_t u_t = e_t \\
+a_{t|t} &= a_t + \tilde{K_t} u_t \\
+P_{t|t} &= P_t - \tilde{K_t}\tilde{K_t}'
+\end{align*}
+\]
+
+\subsubsection{Forecast step t}\label{forecast-step-t-1}
+
+\[
+\begin{align*}
+a_{t+1} &= T_t a_{t|t} \\
+P_{t+1} &= T_t P_{t|t} T_t' + V_t
+\end{align*}
+\]
+
+\subsubsection{Compact form}\label{compact-form-1}
+
+\[
+\begin{align*}
+e_t &= y_t - Z_t a_t \\
+F_t &= Z_t P_t Z_t' + H_t = R_t R_t' \quad(Cholesky) \\
+\tilde{K_t} &=  T_t P_t Z_t' {R_t'}^{-1} \Leftrightarrow \tilde{K_t} R_t' = T_t P_t Z_t' \\
+u_t &= R_t^{-1} e_t \Leftrightarrow R_t u_t = e_t \\
+a_{t+1} &= T_t a_t + \tilde{K_t} u_t \\
+P_{t+1} &= T_t P_{t} T_t' + V_t - \tilde{K_t}\tilde{K_t}' 
+\end{align*}
+\]
+
+\subsubsection{Special cases}\label{special-cases}
+
+This implementation is robust (the covariance matrices are symmetric by
+construction) and makes the computation of the likelihood easy. It also
+provides a straightforward solution for singular covariance matrices and
+for missing values.
+
+When some observations are missing, we just remove from \(Z_t\) the
+corresponding equations.
+
+When the covariance matrix \(F_t\) is singular, some columns of \(R_t\)
+are equal to 0. Those columns correspond to ``redundant'' equations. The
+corresponding errors \(u_t\) and the corresponding columns in the gain
+matrix are undefined (set to 0). The over-determined system
+\(R_t u_t = e_t\) imposes some restrictions on the observations, which
+can be easily checked (the system must be solvable).
+
+When the measurement errors are diagonal, it should be noted that the
+solution based on the Cholesky decomposition is identical to the
+so-called univariate treatment of multi-variate models.
+
+The following elemnts are saved in objects of the class
+\texttt{MultivariateFilteringResults}
+
+\(a_t, P_t, U_t, R_t, \tilde{K_t}\)
+
+\subsection{Implementation}\label{implementation-3}
+
+The ordinary filter is implemented in the classes
+\texttt{jdplus.toolkit.base.core.ssf.univariate.OrdinaryFilter} and
+\texttt{jdplus.toolkit.base.core.ssf.multivariate.MultivariateOrdinaryFilter}.
+
+\section{Smoother}\label{smoother}
+
+\subsection{Univariate model}\label{univariate-model-1}
+
+\subsection{Multivriate model}\label{multivriate-model}
+
+\chapter{DK filters}\label{dk-filters}
+
+\chapter{Augmented filter}\label{augmented-filter}
+
+\chapter{Array filters}\label{array-filters}
+
+\chapter{Chandrasekhar filters}\label{chandrasekhar-filters}
+
+\chapter{Likelihood}\label{likelihood}
+
+\section{Stationary models}\label{stationary-models}
+
+When the initial state of the model is completely specified, the Kalman
+filter provides the exact likelihood in a trivial way, using the
+prediction error decomposition:
+
+\[ p(y_0, \ldots, y_{n-1}) = p(y_0) p(y_1\vert y_0) \ldots p(y_{n-1}\vert y_0 \ldots, y_{n-2})\]
+
+Using the notations defined for the ordinary filter, we have:
+
+\subsection{univariate case:}\label{univariate-case}
+
+\[\log l(\theta, \sigma^2 \vert y)=-1/2\left(n \log(2 \pi) + n \log(\sigma^2)  +  \frac{1}{\sigma^2}\sum_{i=0}^{i<n} e_i^2/f_i + \sum_{i=0}^{i<n} {\log \vert f_i \vert }\right)\]
+By concentrating \(\sigma^2\) out of the likelihood and by writing
+\(RSS=\sum_{i=1}^n e_i^2/f_i\), we obtain :
+
+\[
+\begin{align*}
+\hat{\sigma}^2 &= \frac{RSS}{n} \\
+\log l_c(\theta \vert y)&=-1/2\left(n \log(2 \pi) + n - n \log(n) + n \log(RSS) + \sum_{i=0}^{i<n} {\log \vert f_i \vert }\right)
+\end{align*}
+\]
+
+\subsection{multi-variate case:}\label{multi-variate-case}
+
+if we write \(N=\sum_{i=0}^n{T_i}\) where \(T_i\) is the number of
+observations for the period \(i\) and \(RSS=\sum_{i=1}^n u_i'u_i\), we
+get:
+
+\[
+\begin{align*}
+\log l(\theta, \sigma^2 \vert y) &=-1/2\left(N \log(2 \pi) + N \log(\sigma^2)  +  \frac{1}{\sigma^2}\sum_{i=0}^{i<n} u_i'u_i + 2\sum_{i=0}^{i<n} {\log \vert R_i \vert }\right) \\
+\hat{\sigma}^2 &= \frac{RSS}{N} \\
+\log l_c(\theta \vert y) &=-1/2\left(N \log(2 \pi) + N  -N \log(N) + N\log(RSS) + 2\sum_{i=0}^{i<n} {\log \vert R_i \vert }\right) 
+\end{align*}
+\]
+
+\section{Diffuse models}\label{diffuse-models}
+
+\subsection{State space models as linear regression
+models}\label{state-space-models-as-linear-regression-models}
+
+The general linear gaussian state space model can be transformed in the
+regression model
+
+\[z = y - c = X \delta + \mu  \] where
+
+\[c_t= Z_t\left[ \left(\prod_{i=0}^{i<t}{T_i}\right)\right]b \quad X_t = Z_t\left[ \left(\prod_{i=0}^{i<t}{T_i}\right)\right]B \]
+
+and the covariance matrix \(\sigma^2\Omega\) of \(\mu\) depends on the
+structure of the state space model
+
+\subsection{Profile likelihood}\label{profile-likelihood}
+
+\subsection{Diffuse likelihood}\label{diffuse-likelihood}
+
+\subsection{Marginal likelihood}\label{marginal-likelihood}
+
+\subsection{Implementation}\label{implementation-4}
+
+The univariate version of the transformation of the diffuse elements in
+regression variables is implemented by the method
+\texttt{jdplus.toolkit.base.core.ssf.diffuseEffects} and the
+transformation of \(a_0\) by
+\texttt{jdplus.toolkit.base.core.ssf.initialEffect}
+
+When the covariance matrix of the process is defined up to the scaling
+factor \(\sigma^2\), we define the diffuse likelihood as
+
+\[l(y\vert \theta, \sigma^2) = \lim_{k \rightarrow \infty} \left(l(y \vert k, \theta,\sigma^2)  (2 \pi \sigma^2 k)^{d/2}\right)\]
+
+This is similar to Francke et al.(2010), (equation 14). Apart from the
+scaling factor, it is also identical to the approach of Ansley and Kohn
+(1985) (theorem 5.1).
+
+Otherwise, we use the usual definition:
+
+\[l(y\vert \theta) = \lim_{k \rightarrow \infty} \left(l(y \vert k, \theta)  (2 \pi  k)^{d/2}\right)\]
+
+\subsection{Durbin-Koopman approach}\label{durbin-koopman-approach}
+
+The expression of the log-likelihood for stationary model as to be
+corrected by the term
+
+\[ -1/2 \sum_{i=1}^d {\log \vert F_{\infty, i} \vert }\]
+
+to get the diffuse likelihood by means of the approach of
+\href{dk/md}{Durbin and Koopman}. To simplify the notations, we
+considered above that the diffuse initialization is performed with the
+first \(d\) observations. See DK for the general case.
+
+\subsection{De Jong approach}\label{de-jong-approach}
+
+\section{Bibliography}\label{bibliography-1}
+
+ANSLEY F. C. and KOHN R. (1985), ``Estimating, filtering and smoothing
+in state space models with incompletely specified initial conditions'',
+The annals of statistics, vol.~13, n°4, 1286-1316.
+
+DURBIN J. AND KOOPMAN S.J. (2012): ``Time Series Analysis by State Space
+Methods'', second edition. Oxford University Press.
+
+FRANCKE, M. K., KOOPMAN, S. J. and DE VOS, A. F. (2010), ``Likelihood
+functions for state space models with diffuse initial conditions'',
+Journal of Time Series Analysis, 31, 6.
+
+KOHN R. AND ANSLEY F. C. (1985), ``Efficient estimation and prediction
+in time series regression models'', Biometrika, 72, 694-697.
+
+\part{Implementations}
+
+\chapter{Java implementation}\label{java-implementation}
+
+\chapter{R implementation}\label{r-implementation}
+
+\chapter{Rcpp implementation}\label{rcpp-implementation}
 
 
 
