@@ -4,21 +4,34 @@
 
 When the initial state of the model is completely specified, the Kalman filter provides the exact likelihood in a trivial way, using the prediction error decomposition:
 
-$$ p(y_1, \ldots, y_n) = p(y_1) p(y_2\vert y_1) \ldots p(y_n\vert y_1 \ldots, y_{n-1})$$
+$$ p(y_0, \ldots, y_{n-1}) = p(y_0) p(y_1\vert y_0) \ldots p(y_{n-1}\vert y_0 \ldots, y_{n-2})$$
 
-So, by concentrating the scaling factor $\sigma^2$ out of the likelihood, we get, using the notations defined for the ordinary filter:
+Using the notations defined for the ordinary filter, we have:
 
-univariate case:
+### univariate case:
 
-$$\log l_c(\theta \vert y)=-1/2\left(n \log(2 \pi) + n  + n\log \frac{1}{n}\sum_{i=1}^n e_i^2/f_i + \sum_{i=1}^n {\log \vert f_i \vert }\right)$$
+$$\log l(\theta, \sigma^2 \vert y)=-1/2\left(n \log(2 \pi) + n \log(\sigma^2)  +  \frac{1}{\sigma^2}\sum_{i=0}^{i<n} e_i^2/f_i + \sum_{i=0}^{i<n} {\log \vert f_i \vert }\right)$$
+By concentrating $\sigma^2$ out of the likelihood and by writing $RSS=\sum_{i=1}^n e_i^2/f_i$, we obtain :
 
-$$=-1/2\left(n \log(2 \pi) + n  -n \log n + n\log \sum_{i=1}^n e_i^2/f_i + \sum_{i=1}^n {\log \vert f_i \vert }\right)$$
+$$
+\begin{align*}
+\hat{\sigma}^2 &= \frac{RSS}{n} \\
+\log l_c(\theta \vert y)&=-1/2\left(n \log(2 \pi) + n - n \log(n) + n \log(RSS) + \sum_{i=0}^{i<n} {\log \vert f_i \vert }\right)
+\end{align*}
+$$
 
-multi-variate case:
+### multi-variate case:
 
-$$\log l_c(\theta \vert y)=-1/2\left(n \log(2 \pi) + n  + n\log \frac{1}{n}\sum_{i=1}^n u_i' u_i + 2\sum_{i=1}^n {\log \vert R_i \vert }\right)$$
+if we write $N=\sum_{i=0}^n{T_i}$ where $T_i$ is the number of observations for the period $i$ and $RSS=\sum_{i=1}^n u_i'u_i$, we get:
 
-$$=-1/2\left(n \log(2 \pi) + n  - n\log n + n \log \sum_{i=1}^n u_i' u_i + 2\sum_{i=1}^n {\log \vert R_i \vert }\right)$$
+$$
+\begin{align*}
+\log l(\theta, \sigma^2 \vert y) &=-1/2\left(N \log(2 \pi) + N \log(\sigma^2)  +  \frac{1}{\sigma^2}\sum_{i=0}^{i<n} u_i'u_i + 2\sum_{i=0}^{i<n} {\log \vert R_i \vert }\right) \\
+\hat{\sigma}^2 &= \frac{RSS}{N} \\
+\log l_c(\theta \vert y) &=-1/2\left(N \log(2 \pi) + N  -N \log(N) + N\log(RSS) + 2\sum_{i=0}^{i<n} {\log \vert R_i \vert }\right) 
+\end{align*}
+$$
+
 
 ## Diffuse models
 
@@ -28,7 +41,9 @@ The general linear gaussian state space model can be transformed in the regressi
 
 $$z = y - c = X \delta + \mu  $$ where
 
-$$c_t= Z_t\left[ \left(\prod_{i=0}^{i<t}{T_i}\right)\right]a0, \quad X_t = Z_t\left[ \left(\prod_{i=0}^{i<t}{T_i}\right)\right]B $$ and the covariance matrix $\sigma^2\Omega$ of $\mu$ depends on the structure of the state space model
+$$c_t= Z_t\left[ \left(\prod_{i=0}^{i<t}{T_i}\right)\right]b \quad X_t = Z_t\left[ \left(\prod_{i=0}^{i<t}{T_i}\right)\right]B $$
+
+and the covariance matrix $\sigma^2\Omega$ of $\mu$ depends on the structure of the state space model
 
 ### Profile likelihood
 
