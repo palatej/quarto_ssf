@@ -25,6 +25,8 @@ $$ \alpha_{0} = b + B\delta + \mu_{0}$$
 
 $\delta$ is unknown or $\delta \sim N\left(0, \kappa \sigma^2 I \right)$, where $\kappa$ is arbitrary large. $\mu_{0} \sim N\left(0, \sigma^2 P_*\right)$. So, $P_*$ is the variance of the stationary part of the initial state vector and $B$, which must be a full rank matrix, models the diffuse part. We write $BB'=P_\infty$. It should be noted that applying an orthogonal transformation to $B$ or multiplying it by a constant will give exactly the same initialization. Moreover, when the initial state is completely diffuse, $\mu_0$ is not relevant and it can be safely considered as $0$. Finally, it should be noted that imposing that the covariance of $\delta$ is proportional to $I$ is not an actual restriction: in the hypothesis of a more general non singular matrix, we just should pre-multiply $\delta$ by the inverse of the Cholesky factor of that matrix and post-multiply $B$ by that factor to get an equivalent initialization.
 
+In the sequel, we will call "stationary models", the models with a simple initialization (\$a_0 = u_0\$) and "diffuse models" (even when $\delta$ are considered as fixed unknown parameters), the models with the general starting conditions.
+
 The definition used in JD+ is quasi-identical to that of Durbin and Koopman\[1\].
 
 In summary, apart from the scaling factor $\sigma^2$ which can be given or estimated, the model is completely defined by the following quantities (possible default values are indicated in brackets):
