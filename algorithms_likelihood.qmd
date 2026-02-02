@@ -116,6 +116,12 @@ l(y^*; \theta, \sigma^2) &= -1/2\left(m \log 2\pi + m - m \log m + m \log RSS + 
 \end{align*}
 $$
 
+### Comments
+
+-   On occasion, we want to consider some regression parameters as fixed unknown and others as diffuse. That's the case with regression variables and non-stationary noises (for instance in REGARIMA models). In that case, we will include the diffuse correction only for the regression components related to the diffuse initialization.
+-   Other algorithms are available for the computation of the likelihood of diffuse models. They usually try to exploit the special structure of the regression variables. They are often significantly faster, but less stable. The variant of the current definitions based on a QR decomposition fo the computation of the RSS presents a robust solution and should be the preferred one as far as robustness is favored.
+-   the ML estimator of $\sigma^2$ is biased. We usually will correct it (using $m=n - d$) in various tests (not in our definition of the likelihood).
+
 ### Implementation
 
 The univariate version of the transformation of the diffuse elements in regression variables is implemented by the method `jdplus.toolkit.base.core.ssf.diffuseEffects` and the transformation of $a_0$ by `jdplus.toolkit.base.core.ssf.initialEffect`
