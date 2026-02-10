@@ -51,10 +51,10 @@ $$
 \begin{align*}
 e_t &= y_t - Z_t a_t \\
 F_t &= Z_t P_t Z_t' + H_t = R_t R_t' \quad(Cholesky) \\
-\tilde{K_t} &= P_t Z_t' {R_t'}^{-1} \Leftrightarrow \tilde{K_t} R_t' = P_t Z_t' \\
+\tilde{M_t} &= P_t Z_t' {R_t'}^{-1} \Leftrightarrow \tilde{M_t} R_t' = P_t Z_t' \\
 u_t &= R_t^{-1} e_t \Leftrightarrow R_t u_t = e_t \\
-a_{t|t} &= a_t + \tilde{K_t} u_t \\
-P_{t|t} &= P_t - \tilde{K_t}\tilde{K_t}'
+a_{t|t} &= a_t + \tilde{M_t} u_t \\
+P_{t|t} &= P_t - \tilde{M_t}\tilde{M_t}'
 \end{align*}
 $$
 
@@ -86,11 +86,11 @@ This implementation is robust (the covariance matrices are symmetric by construc
 
 When some observations are missing, we just remove from $Z_t$ the corresponding equations.
 
-When the covariance matrix $F_t$ is singular, some columns of $R_t$ are equal to 0. Those columns correspond to "redundant" equations. The corresponding errors $u_t$  and the corresponding columns in the gain matrix are undefined (set to 0). The over-determined system $R_t u_t = e_t$ imposes some restrictions on the observations, which can be easily checked (the system must be solvable).
+When the covariance matrix $F_t$ is singular, some columns of $R_t$ are equal to 0. Those columns correspond to "redundant" equations. The corresponding errors $u_t$ and the corresponding columns in the gain matrix are undefined (set to 0). The over-determined system $R_t u_t = e_t$ imposes some restrictions on the observations, which can be easily checked (the system must be solvable).
 
 When the measurement errors are diagonal, it should be noted that the solution based on the Cholesky decomposition is identical to the so-called univariate treatment of multi-variate models.
 
-The following elemnts are saved in objects of the class ``MultivariateFilteringResults``
+The following elemnts are saved in objects of the class `MultivariateFilteringResults`
 
 $a_t, P_t, U_t, R_t, \tilde{K_t}$
 
@@ -98,11 +98,123 @@ $a_t, P_t, U_t, R_t, \tilde{K_t}$
 
 The ordinary filter is implemented in the classes `jdplus.toolkit.base.core.ssf.univariate.OrdinaryFilter` and `jdplus.toolkit.base.core.ssf.multivariate.MultivariateOrdinaryFilter`.
 
-## Smoother
+## Smoothers
 
 ### Univariate model
 
-### Multivriate model
+#### Notations
 
+We describe hereafter the recursions of the ordinary smoother. The equations related to the variances can be omitted.
+
+$a_t, P_t, M_t \left(=P_t Z_t' \right), f_t, e_t$ are quantities obtained in the filtering process. $r_t$ are auxiliary row-matrices, while $N_t$ are auxiliary square matrices. $r_t,N_t$ are set to 0 at the beginning of the smoothing process.
+
+The following notations are used:
+
+$$
+\begin{align*}
+\tilde a_t &=E\left(\alpha_{t} \vert y_0 \cdots y_{n-1}\right) \\
+\tilde P_t &=var\left(\alpha_{t} \vert y_0 \cdots y_{n-1}\right) \\
+\tilde e_t &=E\left(\epsilon_{t} \vert y_0 \cdots y_{n-1}\right)
+\end{align*}
+$$
+
+#### Recursion for observed $y_t$ and $f_t > 0$
+
+$$
+\begin{align*}
+\text{recall: }K_t &= T_t P_t Z_t' f_t^{-1} = T_t M_t f_t^{-1}\\
+\tilde e_t &= e_t / f_t - r_t K_t \\
+var(\tilde e_t) &= 1/f_t + K_t' N_t K_t \\
+r_{t-1} &= \tilde e_t Z_t + r_t T_t \\
+L_t &= T_t - K_t Z_t \\
+N_{t-1} &= Z_t' Z_t / f_t + L_t' N_t L_t 
+\end{align*}
+$$
+
+#### Recursion for missing $y_t$ or $f_t = 0$
+
+$$
+\begin{align*}
+ r_{t-1} &= r_t T_t \\
+N_{t-1} &= T_t' N_t T_t
+\end{align*}
+$$
+
+#### Smoothed states
+
+The smoothed states are then obtained by
+
+$$
+\begin{align*}
+\tilde a_t' &= a_t' + r_t P_t \\
+\tilde P_t &= P_t + P_t N_t P_t
+\end{align*}
+$$
+
+#### Smoothed disturbances
+
+The smoothed disturbances, which can be useful for diagnostics, are computed by
+
+$$
+\begin{align*}
+\tilde u_t &= r_t S_t \\
+var\left(\tilde u_t \right) &= V_t-S_t' N_t S_t
+\end{align*}
+$$
+
+#### Implementation details
+
+The ordinary smoother for univariate models is implemented in the class `jdplus.toolkit.base.core.ssf.univariate.OrdinarySmoother`
+
+Most equations are straightforward and uses functional forms.
+The most expensive part is the computation of $\tilde P_t$, for which we process as follows:
+
+
+$$
+\begin{align*}
+ A &=  xl(xl(N_t)) \\
+ N_{t-1} &= Z_t' Z_t / f_t + A
+\end{align*}
+$$
+
+where the operator $xl(x)=x(T_t - K_t Z_T)$ is computed following the fast equations:
+
+$$
+\begin{align*}
+q &= x T_t \\
+w &= q M_t \\
+xl(x) &= q - w f_t^{-1} Z_t
+\end{align*}
+$$
+That transformation, which doesn't imply explicit matrix computations, is applied successively on the columns and on the rows of $N_t$ 
+
+
+### Multivariate model
+
+$a_t, P_t, \tilde M_t \left(\text{such that }M_t R'_t = P_t Z_t' \right), R_t, u_t\left(\text{such that } u_t R'_t = e_t \right)$ are quantities obtained in the filtering process. $R_t$ is the Cholesky factor of $F_t$ ($R_t R'_t = F_t$), It can contain rows/columns equal to 0 when $F_t$ is non invertible.
+
+The previous algorithm becomes:
+
+#### Recursion for observed $y_t$ 
+
+$$
+\begin{align*}
+\tilde K_t &= T_t \tilde M_t \\
+\tilde e_t R_t &= (u_t - r_t \tilde K_t) \\
+R'_t var(\tilde e_t) R_t &= I+ K_t' N_t K_t \\
+r_{t-1} &= \tilde e_t Z_t + r_t T_t \\
+L_t &= T_t - K_t Z_t \\
+Z_t &= R_t W_t \\
+N_{t-1} &= W_t' W_t + L_t' N_t L_t
+\end{align*}
+$$
+#### Recursion for missing $y_t$ $
+
+$$
+\begin{align*}
+ r_{t-1} &= r_t T_t \\
+N_{t-1} &= T_t' N_t T_t
+\end{align*}
+$$
 
 

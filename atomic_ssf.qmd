@@ -287,7 +287,9 @@ $$\alpha_t=
 l_t \\ 
 n_t  
 \end{pmatrix}
-$$ \### Dynamics
+$$ \
+
+### Dynamics
 
 $$
 \begin{align*}
