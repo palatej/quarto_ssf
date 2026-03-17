@@ -1,4 +1,5 @@
 % Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
 \PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
@@ -7,21 +8,22 @@
   letterpaper,
   DIV=11,
   numbers=noendperiod]{scrreprt}
-
+\usepackage{xcolor}
 \usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
 \else % if luatex or xetex
-  \usepackage{unicode-math}
+  \usepackage{unicode-math} % this also loads fontspec
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
 \fi
 \usepackage{lmodern}
-\ifPDFTeX\else  
-    % xetex/luatex font selection
+\ifPDFTeX\else
+  % xetex/luatex font selection
 \fi
 % Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -39,9 +41,6 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
-\usepackage{xcolor}
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-\setcounter{secnumdepth}{5}
 % Make \paragraph and \subparagraph free-standing
 \makeatletter
 \ifx\paragraph\undefined\else
@@ -66,9 +65,48 @@
 \fi
 \makeatother
 
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{241,243,245}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.40,0.45,0.13}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.28,0.35,0.67}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.46,0.62}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.07,0.07,0.07}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
 
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
+\usepackage{longtable,booktabs,array}
 \usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
@@ -80,50 +118,33 @@
 \makesavenoteenv{longtable}
 \usepackage{graphicx}
 \makeatletter
-\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
-\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
-\makeatother
-% Scale images if necessary, so that they will not overflow the page
-% margins by default, and it is still possible to overwrite the defaults
-% using explicit options in \includegraphics[width, height, ...]{}
-\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
 % Set default figure placement to htbp
-\makeatletter
 \def\fps@figure{htbp}
 \makeatother
-% definitions for citeproc citations
-\NewDocumentCommand\citeproctext{}{}
-\NewDocumentCommand\citeproc{mm}{%
-  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
-\makeatletter
- % allow citations to break across lines
- \let\@cite@ofmt\@firstofone
- % avoid brackets around text for \cite:
- \def\@biblabel#1{}
- \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
-\makeatother
-\newlength{\cslhangindent}
-\setlength{\cslhangindent}{1.5em}
-\newlength{\csllabelwidth}
-\setlength{\csllabelwidth}{3em}
-\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
- {\begin{list}{}{%
-  \setlength{\itemindent}{0pt}
-  \setlength{\leftmargin}{0pt}
-  \setlength{\parsep}{0pt}
-  % turn on hanging indent if param 1 is 1
-  \ifodd #1
-   \setlength{\leftmargin}{\cslhangindent}
-   \setlength{\itemindent}{-1\cslhangindent}
-  \fi
-  % set entry spacing
-  \setlength{\itemsep}{#2\baselineskip}}}
- {\end{list}}
-\usepackage{calc}
-\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
-\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
-\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
-\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+ 
+
 
 \KOMAoption{captions}{tableheading}
 \makeatletter
@@ -170,14 +191,9 @@
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
 \@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
 \makeatother
-
-\ifLuaTeX
-  \usepackage{selnolig}  % disable illegal ligatures
-\fi
 \usepackage{bookmark}
-
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same} % disable monospaced font for URLs
+\urlstyle{same}
 \hypersetup{
   pdftitle={Quarto-SSF},
   pdfauthor={Jean Palate},
@@ -192,7 +208,6 @@
 \title{Quarto-SSF}
 \author{Jean Palate}
 \date{2026-02-01}
-
 \begin{document}
 \maketitle
 
@@ -222,8 +237,6 @@
 \markboth{References}{References}
 
 \phantomsection\label{refs}
-\begin{CSLReferences}{0}{1}
-\end{CSLReferences}
 
 \part{Introduction}
 
@@ -274,6 +287,11 @@ restriction: in the hypothesis of a more general non singular matrix, we
 just should pre-multiply \(\delta\) by the inverse of the Cholesky
 factor of that matrix and post-multiply \(B\) by that factor to get an
 equivalent initialization.
+
+In the sequel, we will call ``stationary models'', the models with a
+simple initialization (\$a\_0 = u\_0\$) and ``diffuse models'' (even
+when \(\delta\) are considered as fixed unknown parameters), the models
+with the general starting conditions.
 
 The definition used in JD+ is quasi-identical to that of Durbin and
 Koopman{[}1{]}.
@@ -336,8 +354,8 @@ those vectors at different time points. For instance, using obvious
 notations, we will consider:
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2571}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7429}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.2571}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.7429}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Operations
@@ -737,7 +755,9 @@ The state block is
 l_t \\ 
 n_t  
 \end{pmatrix}
-\] \#\#\# Dynamics
+\]\\
+
+\subsection{Dynamics}\label{dynamics-5}
 
 \[
 \begin{align*}
@@ -803,7 +823,7 @@ Moreover, the constraint that the sum of the latent variables is 0
 allows us to consider only \(s-1\) periods (the missing one being the
 opposite of the sum of all the other periods).
 
-\subsection{Dynamics}\label{dynamics-5}
+\subsection{Dynamics}\label{dynamics-6}
 
 \[ T_t = \begin{pmatrix} 0 & 1 & \cdots & 0 \\ \vdots & \ddots & \ddots & \vdots \\ 0 &  \cdots & 0 & 1  \\ -1 & -1 & \cdots & -1\end{pmatrix}\]
 
@@ -811,9 +831,9 @@ The covariance matrix of the innovations can take various form. Using
 the terminology of Proietti, we consider:
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Model
@@ -863,7 +883,7 @@ Using those notations, the state-space model can be written as follows :
 
 \[ \alpha_t= \begin{pmatrix} y_t \\ y_t^* \end{pmatrix}\]
 
-\subsection{Dynamics}\label{dynamics-6}
+\subsection{Dynamics}\label{dynamics-7}
 
 \[ T_t = \begin{pmatrix} \rho \cos{\gamma} &&   \rho \sin{\gamma}\\  -\rho \sin{\gamma}  && \rho \cos{\gamma}\end {pmatrix}\]
 
@@ -945,10 +965,10 @@ equivalent) implementation:
 \begin{align*}
 e_t &= y_t - Z_t a_t \\
 F_t &= Z_t P_t Z_t' + H_t = R_t R_t' \quad(Cholesky) \\
-\tilde{K_t} &= P_t Z_t' {R_t'}^{-1} \Leftrightarrow \tilde{K_t} R_t' = P_t Z_t' \\
+\tilde{M_t} &= P_t Z_t' {R_t'}^{-1} \Leftrightarrow \tilde{M_t} R_t' = P_t Z_t' \\
 u_t &= R_t^{-1} e_t \Leftrightarrow R_t u_t = e_t \\
-a_{t|t} &= a_t + \tilde{K_t} u_t \\
-P_{t|t} &= P_t - \tilde{K_t}\tilde{K_t}'
+a_{t|t} &= a_t + \tilde{M_t} u_t \\
+P_{t|t} &= P_t - \tilde{M_t}\tilde{M_t}'
 \end{align*}
 \]
 
@@ -1006,21 +1026,144 @@ The ordinary filter is implemented in the classes
 \texttt{jdplus.toolkit.base.core.ssf.univariate.OrdinaryFilter} and
 \texttt{jdplus.toolkit.base.core.ssf.multivariate.MultivariateOrdinaryFilter}.
 
-\section{Smoother}\label{smoother}
+\section{Smoothers}\label{smoothers}
 
 \subsection{Univariate model}\label{univariate-model-1}
 
-\subsection{Multivriate model}\label{multivriate-model}
+\subsubsection{Notations}\label{notations}
 
-\chapter{DK filters}\label{dk-filters}
+We describe hereafter the recursions of the ordinary smoother. The
+equations related to the variances can be omitted.
 
-\chapter{Augmented filter}\label{augmented-filter}
+\(a_t, P_t, M_t \left(=P_t Z_t' \right), f_t, e_t\) are quantities
+obtained in the filtering process. \(r_t\) are auxiliary row-matrices,
+while \(N_t\) are auxiliary square matrices. \(r_t,N_t\) are set to 0 at
+the beginning of the smoothing process.
 
-\chapter{Array filters}\label{array-filters}
+The following notations are used:
+
+\[
+\begin{align*}
+\tilde a_t &=E\left(\alpha_{t} \vert y_0 \cdots y_{n-1}\right) \\
+\tilde P_t &=var\left(\alpha_{t} \vert y_0 \cdots y_{n-1}\right) \\
+\tilde e_t &=E\left(\epsilon_{t} \vert y_0 \cdots y_{n-1}\right)
+\end{align*}
+\]
+
+\subsubsection{\texorpdfstring{Recursion for observed \(y_t\) and
+\(f_t > 0\)}{Recursion for observed y\_t and f\_t \textgreater{} 0}}\label{recursion-for-observed-y_t-and-f_t-0}
+
+\[
+\begin{align*}
+\text{recall: }K_t &= T_t P_t Z_t' f_t^{-1} = T_t M_t f_t^{-1}\\
+\tilde e_t &= e_t / f_t - r_t K_t \\
+var(\tilde e_t) &= 1/f_t + K_t' N_t K_t \\
+r_{t-1} &= \tilde e_t Z_t + r_t T_t \\
+L_t &= T_t - K_t Z_t \\
+N_{t-1} &= Z_t' Z_t / f_t + L_t' N_t L_t 
+\end{align*}
+\]
+
+\subsubsection{\texorpdfstring{Recursion for missing \(y_t\) or
+\(f_t = 0\)}{Recursion for missing y\_t or f\_t = 0}}\label{recursion-for-missing-y_t-or-f_t-0}
+
+\[
+\begin{align*}
+ r_{t-1} &= r_t T_t \\
+N_{t-1} &= T_t' N_t T_t
+\end{align*}
+\]
+
+\subsubsection{Smoothed states}\label{smoothed-states}
+
+The smoothed states are then obtained by
+
+\[
+\begin{align*}
+\tilde a_t' &= a_t' + r_t P_t \\
+\tilde P_t &= P_t + P_t N_t P_t
+\end{align*}
+\]
+
+\subsubsection{Smoothed disturbances}\label{smoothed-disturbances}
+
+The smoothed disturbances, which can be useful for diagnostics, are
+computed by
+
+\[
+\begin{align*}
+\tilde u_t &= r_t S_t \\
+var\left(\tilde u_t \right) &= V_t-S_t' N_t S_t
+\end{align*}
+\]
+
+\subsubsection{Implementation details}\label{implementation-details}
+
+The ordinary smoother for univariate models is implemented in the class
+\texttt{jdplus.toolkit.base.core.ssf.univariate.OrdinarySmoother}
+
+Most equations are straightforward and uses functional forms. The most
+expensive part is the computation of \(\tilde P_t\), for which we
+process as follows:
+
+\[
+\begin{align*}
+ A &=  xl(xl(N_t)) \\
+ N_{t-1} &= Z_t' Z_t / f_t + A
+\end{align*}
+\]
+
+where the operator \(xl(x)=x(T_t - K_t Z_T)\) is computed following the
+fast equations:
+
+\[
+\begin{align*}
+q &= x T_t \\
+w &= q M_t \\
+xl(x) &= q - w f_t^{-1} Z_t
+\end{align*}
+\] That transformation, which doesn't imply explicit matrix
+computations, is applied successively on the columns and on the rows of
+\(N_t\)
+
+\subsection{Multivariate model}\label{multivariate-model-1}
+
+\(a_t, P_t, \tilde M_t \left(\text{such that }M_t R'_t = P_t Z_t' \right), R_t, u_t\left(\text{such that } u_t R'_t = e_t \right)\)
+are quantities obtained in the filtering process. \(R_t\) is the
+Cholesky factor of \(F_t\) (\(R_t R'_t = F_t\)), It can contain
+rows/columns equal to 0 when \(F_t\) is non invertible.
+
+The previous algorithm becomes:
+
+\subsubsection{\texorpdfstring{Recursion for observed
+\(y_t\)}{Recursion for observed y\_t}}\label{recursion-for-observed-y_t}
+
+\[
+\begin{align*}
+\tilde K_t &= T_t \tilde M_t \\
+\tilde e_t R_t &= (u_t - r_t \tilde K_t) \\
+R'_t var(\tilde e_t) R_t &= I+ K_t' N_t K_t \\
+r_{t-1} &= \tilde e_t Z_t + r_t T_t \\
+L_t &= T_t - K_t Z_t \\
+Z_t &= R_t W_t \\
+N_{t-1} &= W_t' W_t + L_t' N_t L_t
+\end{align*}
+\] \#\#\#\# Recursion for missing \(y_t\) \$
+
+\[
+\begin{align*}
+ r_{t-1} &= r_t T_t \\
+N_{t-1} &= T_t' N_t T_t
+\end{align*}
+\]
 
 \chapter{Chandrasekhar filters}\label{chandrasekhar-filters}
 
+\chapter{Array filters}\label{array-filters}
+
 \chapter{Likelihood}\label{likelihood}
+
+We write \(l\) the log of the likelihood
 
 \section{Stationary models}\label{stationary-models}
 
@@ -1034,14 +1177,17 @@ Using the notations defined for the ordinary filter, we have:
 
 \subsection{univariate case:}\label{univariate-case}
 
-\[\log l(\theta, \sigma^2 \vert y)=-1/2\left(n \log(2 \pi) + n \log(\sigma^2)  +  \frac{1}{\sigma^2}\sum_{i=0}^{i<n} e_i^2/f_i + \sum_{i=0}^{i<n} {\log \vert f_i \vert }\right)\]
+\[
+l(y;\theta, \sigma^2)=-1/2\left(n \log(2 \pi) + n \log(\sigma^2)  +  \frac{1}{\sigma^2}\sum_{i=0}^{i<n} e_i^2/f_i + \sum_{i=0}^{i<n} {\log \vert f_i \vert }\right)
+\]
+
 By concentrating \(\sigma^2\) out of the likelihood and by writing
 \(RSS=\sum_{i=1}^n e_i^2/f_i\), we obtain :
 
 \[
 \begin{align*}
 \hat{\sigma}^2 &= \frac{RSS}{n} \\
-\log l_c(\theta \vert y)&=-1/2\left(n \log(2 \pi) + n - n \log(n) + n \log(RSS) + \sum_{i=0}^{i<n} {\log \vert f_i \vert }\right)
+l_c(y; \theta)&=-1/2\left(n \log(2 \pi) + n - n \log(n) + n \log(RSS) + \sum_{i=0}^{i<n} {\log \vert f_i \vert }\right)
 \end{align*}
 \]
 
@@ -1053,9 +1199,9 @@ get:
 
 \[
 \begin{align*}
-\log l(\theta, \sigma^2 \vert y) &=-1/2\left(N \log(2 \pi) + N \log(\sigma^2)  +  \frac{1}{\sigma^2}\sum_{i=0}^{i<n} u_i'u_i + 2\sum_{i=0}^{i<n} {\log \vert R_i \vert }\right) \\
+l(y; \theta, \sigma^2) &=-1/2\left(N \log(2 \pi) + N \log(\sigma^2)  +  \frac{1}{\sigma^2}\sum_{i=0}^{i<n} u_i'u_i + 2\sum_{i=0}^{i<n} {\log \vert R_i \vert }\right) \\
 \hat{\sigma}^2 &= \frac{RSS}{N} \\
-\log l_c(\theta \vert y) &=-1/2\left(N \log(2 \pi) + N  -N \log(N) + N\log(RSS) + 2\sum_{i=0}^{i<n} {\log \vert R_i \vert }\right) 
+l_c(y; \theta) &=-1/2\left(N \log(2 \pi) + N  -N \log(N) + N\log(RSS) + 2\sum_{i=0}^{i<n} {\log \vert R_i \vert }\right) 
 \end{align*}
 \]
 
@@ -1072,13 +1218,104 @@ regression model
 \[c_t= Z_t\left[ \left(\prod_{i=0}^{i<t}{T_i}\right)\right]b \quad X_t = Z_t\left[ \left(\prod_{i=0}^{i<t}{T_i}\right)\right]B \]
 
 and the covariance matrix \(\sigma^2\Omega\) of \(\mu\) depends on the
-structure of the state space model
+structure of the state space model.
+
+As discussed in the paragraph \ldots, the Kalman filter defines the
+linear transformation: \(z \rightarrow e_z/\sqrt{f}\). We write \(z_L\)
+the result of that transformation.
+
+We present below the univariate case. The multi-variate models are
+handled in a similar way.
 
 \subsection{Profile likelihood}\label{profile-likelihood}
 
+When \(\delta\) is considered as fixed unknown, the log-likelihood is:
+
+\[
+l(y;\theta, \delta, \sigma^2)=-1/2\left(n \log(2 \pi) + n \log(\sigma^2)  +  \frac{1}{\sigma^2}\sum_{i=0}^{i<n} (y_i-c_i-X_i \delta)_L^2 + \sum_{i=0}^{i<n} {\log \vert f_i \vert }\right)
+\]
+
+\((y-c-X \delta)_L = (y-c)_L - X_L \delta\) and we can concentrate
+\(\delta\) and \(\sigma^2\) out of the likelihood.
+
+\[ \begin{align*}
+\hat{\delta} &= (X_L'X_L)^{-1}X'_L(y-c)_L \\
+\hat{e}_L &= (y-c)_L - X_L \hat{\delta} \\
+RSS &= \hat{e}_L' \hat{e}_L \\
+\hat{\sigma}^2 &= \frac{RSS}{n} \\
+l_c(y; \theta)&=-1/2\left(n \log(2 \pi) + n - n \log(n) + n \log(RSS) + \sum_{i=0}^{i<n} {\log \vert f_i \vert }\right)
+\end{align*} 
+\]
+
 \subsection{Diffuse likelihood}\label{diffuse-likelihood}
 
+When \(\delta\) is random ( \(\delta \sim N(0, \kappa \sigma^2 I)\) ),
+the log-likelihood is given by:
+
+\[
+l(y; \theta, \sigma^2) = l(y \vert \delta; \theta, \sigma^2) + l(\delta; \theta, \sigma^2) - l(\delta \vert y; \theta , \sigma^2)  
+\]
+
+If d is the dimension of \(\delta\), we have that:
+
+\[
+\begin{align*}
+l(\delta; \theta, \sigma^2) &= -1/2 \left(d \log(2 \pi) + d \log(\sigma^2) + d \log(\kappa) + \frac{1}{\kappa \sigma^2}{\delta'\delta}  \right) \\
+l(y \vert \delta, \theta, \sigma^2) &= -1/2\left(n \log(2 \pi) + n \log(\sigma^2)  +  \frac{1}{\sigma^2}(y -c - X \delta)_L'(y -c - X \delta)_L + \sum_{i=0}^{i<n} {\log \vert f_i \vert }\right) \\ 
+E(\delta \vert y; \theta, \sigma^2) &= (\frac{1}{\kappa}I + {X_L}' X_L)^{-1}{X_L}'(y-c)_L = \Delta_\kappa^{-1}{X_L}'y^c_L \\
+var(\delta \vert; \theta, \sigma^2) &= \sigma^2 (\frac{1}{\kappa}I + {X_L}' X_L)^{-1} = \sigma^2  \Delta_\kappa^{-1}\\
+l(\delta \vert y; \theta , \sigma^2) &=  -1/2 \left(d \log(2 \pi) + d \log(\sigma^2) - \log \vert \Delta_\kappa \vert + \frac{1}{\sigma^2}\delta' \Delta_\kappa \delta + \frac{1}{\sigma^2}{y^c_L}'X_L \Delta_\kappa^{-1}{X_L}'y^c_L -\frac{2}{\sigma^2} {y^c_L}'X_L \delta  \right)
+\end{align*}
+\]
+
+Following Francke et al, we define the diffuse log-likelihood as:
+
+\[
+l_\infty(y; \theta, \sigma^2) = \lim_{\kappa \rightarrow \infty}{l(y;\theta, \sigma^2) + \frac{1}{2}\log(\vert 2 \pi \sigma^2 \kappa I)  \vert} 
+\]
+
+so that, writing \(m=n-d\)
+
+\[
+l_\infty(y; \theta, \sigma^2) = -1/2 \left( m \log(2 \pi) + m - m \log m + m \log RSS + \log \vert {X_L}' X_L \vert + \sum_{i=0}^{i<n} {\log \vert f_i \vert }\right)
+\]
+
 \subsection{Marginal likelihood}\label{marginal-likelihood}
+
+The marginal likelihood is the likelihood of \(y^*=Ay\), which doesn't
+depend on \(\delta\). The transformation A has dimensions \(n\times m\)
+and is such that \(A'X=0\)
+
+\[
+\begin{align*}
+l(y^*; \theta, \sigma^2) &= -1/2\left(m \log 2\pi + m \log \sigma^2 + \log({A_L}'A_L)  + \frac{1}{\sigma^2}{y^c}'A({A_L}'A_L)^{-1}A'y^c\right) \\
+l(y^*; \theta, \sigma^2) &= -1/2\left(m \log 2\pi + m \log \sigma^2 + \log \vert {X_L}'X_L \vert +\frac{1}{\sigma^2} RSS  - \log \vert X'X \vert  +  \sum_{i=0}^{i<n} {\log \vert f_i \vert }\right) \\
+l(y^*; \theta, \sigma^2) &= -1/2\left(m \log 2\pi + m - m \log m + m \log RSS + \log \vert {X_L}' X_L \vert - \log \vert X'X \vert + \sum_{i=0}^{i<n} {\log \vert f_i \vert } \right)
+\end{align*}
+\]
+
+\subsection{Comments}\label{comments}
+
+\begin{itemize}
+\tightlist
+\item
+  On occasion, we want to consider some regression parameters as fixed
+  unknown and others as diffuse. That's the case with regression
+  variables and non-stationary noises (for instance in REGARIMA models).
+  In that case, we will include the diffuse correction only for the
+  regression components related to the diffuse initialization.
+\item
+  Other algorithms are available for the computation of the likelihood
+  of diffuse models. They usually try to exploit the special structure
+  of the regression variables. They are often significantly faster, but
+  less stable. The variant of the current definitions based on a QR
+  decomposition fo the computation of the RSS presents a robust solution
+  and should be the preferred one as far as robustness is favored.
+\item
+  the ML estimator of \(\sigma^2\) is biased. We usually will correct it
+  (using \(m=n - d\)) in various tests (not in our definition of the
+  likelihood).
+\end{itemize}
 
 \subsection{Implementation}\label{implementation-4}
 
@@ -1088,32 +1325,10 @@ regression variables is implemented by the method
 transformation of \(a_0\) by
 \texttt{jdplus.toolkit.base.core.ssf.initialEffect}
 
-When the covariance matrix of the process is defined up to the scaling
-factor \(\sigma^2\), we define the diffuse likelihood as
-
-\[l(y\vert \theta, \sigma^2) = \lim_{k \rightarrow \infty} \left(l(y \vert k, \theta,\sigma^2)  (2 \pi \sigma^2 k)^{d/2}\right)\]
-
-This is similar to Francke et al.(2010), (equation 14). Apart from the
-scaling factor, it is also identical to the approach of Ansley and Kohn
-(1985) (theorem 5.1).
-
-Otherwise, we use the usual definition:
-
-\[l(y\vert \theta) = \lim_{k \rightarrow \infty} \left(l(y \vert k, \theta)  (2 \pi  k)^{d/2}\right)\]
-
-\subsection{Durbin-Koopman approach}\label{durbin-koopman-approach}
-
-The expression of the log-likelihood for stationary model as to be
-corrected by the term
-
-\[ -1/2 \sum_{i=1}^d {\log \vert F_{\infty, i} \vert }\]
-
-to get the diffuse likelihood by means of the approach of
-\href{dk/md}{Durbin and Koopman}. To simplify the notations, we
-considered above that the diffuse initialization is performed with the
-first \(d\) observations. See DK for the general case.
-
-\subsection{De Jong approach}\label{de-jong-approach}
+The different likelihood functions are implemented in
+\texttt{jdplus.toolkit.base.core.ssf.akf.QRFilter}. It should be noted
+that the RSS are computed in that class by means of a QR decomposition
+applied on the variables filtered by the Kalman filter.
 
 \section{Bibliography}\label{bibliography-1}
 
@@ -1131,11 +1346,302 @@ Journal of Time Series Analysis, 31, 6.
 KOHN R. AND ANSLEY F. C. (1985), ``Efficient estimation and prediction
 in time series regression models'', Biometrika, 72, 694-697.
 
+\chapter{Augmented filters}\label{augmented-filters}
+
+The augmented filters are based on papers of De Jong et al.~See more
+especially De Jong and Chu-Chun-Lin {[}2003{]}. So, when we talk about
+the augmented Kalman filters (AKF), we talk about the solution proposed
+by De Jong, Its implementation in JD+ contains a few modifications in
+comparison with the reference paper.
+
+\section{Filtering}\label{filtering}
+
+A first approach consists in transforming the state space form into a
+regression model. We build recursively the regression variables \(X\)
+generated by the diffuse constraints and we apply the Kalman filter on
+\(y, X\) to get \(y_L, X_L\). The least squares problem obtained that
+way is then solved by a robust algorithm like the QR decomposition. See
+the chapter on the computation of the likelihood for more details. The
+solution is computed with all the data (no ``collapsing out'' of the
+diffuse effects). Even if this solution is not the most parsimonious
+one, it is usually quite robust.
+
+A second approach consists in using the first data to get a rapid
+estimate of the diffuse effects, in ``re-injecting'' that estimate in
+the model and in finishing the processing with the ordinary Kalman
+filter (the so-called augmented Kalman filter with a collapsing out of
+the diffuse initialization). Usually, that collapsing is processed as
+quickly as possible, though it is not mandatory. A better strategy would
+consist in waiting till we have a robust enough estimate of the diffuse
+effects (using for instance some condition number; see below for the
+solution used in JD+).
+
+So, in the first case, we consider
+
+\[
+\begin{align*}
+B_t &= \prod{T_0...T_{t-1}}B \\
+\text{or } B_t &= T_{t-1}B_{t-1} \quad, \text{with } B_0=B \\
+X_t &= Z_t B_T
+\end{align*}
+\]
+
+Applying the filter on \(y\) and on \(X\) gives
+
+\[
+\begin{align*}
+e_t &= y_t-Z_t a_t \\
+{y_L}_t &= e_t / \sqrt f_t \\
+a_{t+1} &= T_t a_t + \tilde{K_t} {y_L}_t \\
+E_t &= X_t - Z_t A_t = Z_t (B_t - A_t) \\ 
+{X_L}_t &= (Z_t B_t - Z_t A_t) / \sqrt f_t \\
+A_{t+1} &= T_t A_t + \tilde{K_t} {X_L}_t \quad \text{, with }A_0 = 0 
+\end{align*}
+\] Equivalently, we can use the following recursions
+
+\[
+\begin{align*}
+\tilde{A_o} &= B_0 \\
+\tilde{E_t} &= 0 -  Z_t \tilde A_t \\
+\tilde {X_L}_t &= ( - Z_t \tilde A_t) / \sqrt f_t \\
+\tilde A_{t+1} &= T_t \tilde A_t + \tilde{K_t} \tilde{X_L}_t
+\end{align*}
+\]
+
+We can easily check by induction that:
+
+\[
+\begin{align*}
+\tilde{A_t} &= B_t - A_t \\
+\tilde E_t &= - E_t \\
+\tilde {X_L}_t &= - {X_L}_t
+\end{align*}
+\]
+
+De Jong used in his paper the second form, which is slightly faster. The
+first form should be used if the marginal likelihood is needed (explicit
+computation of \(X\))
+
+The augmented filter is identical to the ordinary filter augmented by
+the effects due to the diffuse initialization. Using the notations of
+the ordinary filter, the new equations are:
+
+\subsection{Update step t}\label{update-step-t-2}
+
+In the univariate case, we add:
+
+\[
+\begin{align*}
+E_t &= - Z_t A_t \\
+A_{t|t} &= A_t + M_t f_t^{-1}E_t 
+\end{align*}
+\] In the multivariate case, we use:
+
+\[
+\begin{align*}
+E_t &= - Z_t A_t \\
+Ut &= R_t^{-1}E_t \\
+A_{t|t} &= A_t + \tilde {M_t} U_t 
+\end{align*}
+\]
+
+\subsection{Forecast step t}\label{forecast-step-t-2}
+
+\[
+\begin{align*}
+A_{t+1} &= T_t A_{t|t} \\
+\end{align*}
+\]
+
+\subsection{Q Matrix}\label{q-matrix}
+
+The results of the previous iterations must be stored to compute the
+usual statistics or additional results (likelihood, smoothing\ldots) In
+the original paper, the so-called \(Q\) matrix ``accumulates'' the
+filtered quantities and their interactions. It is defined recursively by
+
+\[
+Q_t = Q_{t-1} + (E_t, e_t)' {f_t}^{-1} (E_t, e_t) \quad , Q_{-1} = 0
+\]
+
+or
+
+\[
+Q_t = Q_{t-1} + (-\tilde{E_t}, e_t)' {f_t}^{-1} (-\tilde{E_t}, e_t) \quad , Q_{-1} = 0
+\]
+
+In a more compact form, it gives
+
+\[
+Q_t = Q_{t-1} + ( {X_L}_t, {y_l}_t)'( {X_L}_t, {y_l}_t)
+\]
+
+or
+
+\[
+Q_t = Q_{t-1} + (-\tilde {X_L}_t, {y_l}_t)'(-\tilde {X_L}_t, {y_l}_t)
+\]
+
+If we write
+
+\[
+Q_m = 
+\begin{pmatrix}
+S & s \\
+s' & q
+\end{pmatrix}
+\]
+
+we have that the ml estimator of \(\delta\) after \(m\) observations is
+\(S^{-1}s\) and that the ml estimator of \(\sigma^2\) is \(q/m\) We
+re-inject the effect of the diffuse initialization by adding to
+\(a_m, P_m, q_m\) respectively
+\(-A_m S^{-1}s, A_m S^{-1} A_m', s' S^{-1} s\)
+
+To find the ``collapsing point'' \(m\), \(S\) must be invertible.
+Several approaches can be considered to achieve that goal.
+
+\begin{itemize}
+\tightlist
+\item
+  Use directly the \(Q\) matrix and check the invertibility of \(S\) by
+  Cholesky
+\item
+  Triangularize \(Q\) either completely or triangularize only \(S\) by
+  means of (fast) Givens transformations, so that S in never explicitly
+  computed
+\item
+  Accumulate \((\tilde {X_L}_t, {y_l}_t)\) in a matrix and use QR
+  (recursively or not) to find the corresponding least squares problem
+\item
+  \ldots{}
+\end{itemize}
+
+See below some explanations on the triangularization of Q (t omitted).
+
+We suppose that the triangular form of \(Q\) is \(Q_T\) so that
+\(Q = Q_T Q_T'\)
+
+\[
+Q_T=\begin{pmatrix}
+A & 0 \\
+b & c
+\end{pmatrix}
+\]
+
+We have that:
+
+\[
+\begin{align*}
+S = AA' \\
+s = A b' \\
+q=b b' + c^2 \\
+s' S^{-1} s = b A' (AA')^{-1} A b' = b b' \\
+q - s' S^{-1} s = c^2 \\
+S^{-1} s = (AA')^{-1} A b' = A'^{-1}b'
+\end{align*}
+\]
+
+The ml estimator of \(\delta\) is then \(bA^{-1}\), its variance
+\(\Psi= S^{-1}\) s and the ml estimator of \(\sigma^2\) is \(c^2/n\)
+
+\subsection{Collapsing}\label{collapsing}
+
+As mentioned above, the collapsing is performed as follow:
+
+\[ 
+\begin{align*}
+a_{m_c} &= a_m - A_m \hat{\delta} \\
+P_{m_c} &= P_m + A_m \Psi A_m'
+\end{align*}
+\]
+
+\section{Smoothing}\label{smoothing}
+
+\subsection{Computation of the
+smoothations}\label{computation-of-the-smoothations}
+
+\[ 
+\begin{align*}
+K_t &= T_t P_t Z_t' {f_t}^{-1} \\
+\tilde e_t &=  f_t^{-1}e_t - K_t'r_t \\
+\tilde E_t &=  f_t^{-1}E_t - K_t'R_t \\
+var(\tilde e_t) &= f_t^{-1} + K_t' N_t K_t \\
+var(\tilde E_t) &= f_t^{-1} + K_t' N_t K_t \\
+\end{align*}
+\]
+
+\subsection{Main recursions}\label{main-recursions}
+
+\[ 
+\begin{align*}
+r_{t-1}' &= \tilde e_t Z_t + r_t' T_t \\
+R_{t-1}' &= \tilde E_t Z_t + R_t' T_t \\
+L_t &= T_t - K_t Z_t \\
+N_{t-1} &= Z_t' f_t^{-1} Z_t + L_t' N_t L_t 
+\end{align*}
+\]
+
+\subsection{Update of the state}\label{update-of-the-state}
+
+\[ 
+\begin{align*}
+&\text{using } B_t = A_t + P_t R_{t-1} \\
+\hat \delta &= E(\delta \vert y) = S^{-1}s\\
+\Psi &= var(\delta \vert y) = S^{-1} \\
+\tilde a_t &= a_t + P_t r_{t-1} + B_t \hat \delta \\
+\tilde P_t &= P_t - P_t N_{t-1} P_t +B_t \Psi B_t'
+\end{align*}
+\]
+
+\subsection{\texorpdfstring{Update of the state in the case of
+collapsing in
+\(m\)}{Update of the state in the case of collapsing in m}}\label{update-of-the-state-in-the-case-of-collapsing-in-m}
+
+\[ 
+\begin{align*}
+\hat \delta = E(\delta \vert y) &= S^{-1}(s + A'_m r_{m-1}) \\
+\Psi = var(\delta \vert y) & = S^{-1} - S^{-1}(A_m' N_{m-1} A_m)S^{-1} \\
+\end{align*}
+\] \[ 
+\begin{align*}
+C_t &= P_t(R_{t-1} + N_{t-1} A_t) \\
+\tilde a_t &= a_t + P_t r_{t-1} + B_t \hat \delta \\
+\tilde P_t &= P_t - P_t N_{t-1} P_t + B_t \Psi B_t'- B_t S^{-1} C'_t - C_t S^{-1} B'_t
+\end{align*}
+\]
+
+\chapter{DK filters}\label{dk-filters}
+
 \part{Implementations}
 
 \chapter{Java implementation}\label{java-implementation}
 
 \chapter{R implementation}\label{r-implementation}
+
+\section{Examples}\label{examples}
+
+\subsection{Atomic blocks}\label{atomic-blocks-1}
+
+\subsubsection{ARMA models}\label{arma-models}
+
+\subsection{Models}\label{models}
+
+\subsubsection{Basic structural model}\label{basic-structural-model}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{s}\OtherTok{\textless{}{-}}\NormalTok{rjd3toolkit}\SpecialCharTok{::}\NormalTok{ABS}\SpecialCharTok{$}\NormalTok{X0.}\DecValTok{2}\NormalTok{.}\DecValTok{20}\NormalTok{.}\FloatTok{10.}\NormalTok{M}
+\NormalTok{model}\OtherTok{\textless{}{-}}\NormalTok{rjd3sts}\SpecialCharTok{::}\FunctionTok{model}\NormalTok{()}
+\NormalTok{llt}\OtherTok{\textless{}{-}}\FunctionTok{locallineartrend}\NormalTok{(}\StringTok{"llt"}\NormalTok{)}
+\NormalTok{seas}\OtherTok{\textless{}{-}}\FunctionTok{seasonal}\NormalTok{(}\StringTok{"seas"}\NormalTok{, }\AttributeTok{period=}\FunctionTok{frequency}\NormalTok{(s), }\AttributeTok{type=}\StringTok{"HarrisonStevens"}\NormalTok{)}
+\NormalTok{noise}\OtherTok{\textless{}{-}}\FunctionTok{noise}\NormalTok{(}\StringTok{"n"}\NormalTok{, }\AttributeTok{fixed =} \ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{add}\NormalTok{(model, llt)}
+\FunctionTok{add}\NormalTok{(model, seas)}
+\FunctionTok{add}\NormalTok{(model, noise)}
+\NormalTok{rslt}\OtherTok{\textless{}{-}}\FunctionTok{estimate}\NormalTok{(model, }\FunctionTok{log}\NormalTok{(s))}
+\end{Highlighting}
+\end{Shaded}
 
 \chapter{Rcpp implementation}\label{rcpp-implementation}
 
