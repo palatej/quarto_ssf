@@ -1,3 +1,56 @@
 ---
 title: "Linear filters"
 ---
+
+## Overview
+
+A transformation $F:A \rightarrow B:  x \rightarrow F(x) = y$  is linear provided that $F(x_1 + \gamma x_2)=F(x_1) + \gamma F(x_2)$.
+
+We discussed below the fact the Kalman filter is a linear filter.
+That means, in particular, that for a regression model $y = X\beta +\epsilon$ with fixed unknown $\beta$ we can find their estimates by a simple OLS applied on $y$ and on $X$ transformed by the filter corresponding to $\epsilon$. 
+
+
+We consider here that $A = \mathbb{R}^n$ and that $B = \mathbb{R}^m, m \le n$
+
+## Stationary models
+
+For a given model (including the state initialization), it is easy to see that the ordinary Kalman filter is a linear filter.
+We just have to inspect the filter step by step.
+
+We consider two series $x_t, y_t$ and their linear combination $z_t=x_t + \gamma y_y$. We will index the different quantities produced by the filter by their corresponding series.
+
+We suppose that $a_{z,0}=a_{x,0} + \gamma a_{y, 0}$, which is the case of course the case for unconditional initialization.
+
+We have, by recursion:
+
+$$
+\begin{align*}
+e_{z_t} &= z_t - Z_t a_{z,t} \\
+&= x_t + \gamma y_t - Z_t (a_{x,t}- \gamma a_{y,t}) \\ 
+&= x_t - Z_t a_{x,t}+ \gamma (y_t -Z_t a_{y,t}) \\
+&= e_{x,t} + \gamma e_{y,t} \\
+a_{z, t+1} &= T_t a_{z, t} + K_t e_{z,t} \\
+&= T_t a_{x, t} + K_t e_{x,t} + \gamma T_t a_{y, t} + \gamma K_t e_{y,t} \\
+&= a_{x, t+1} + \gamma a_{y, t+1} \\
+\end{align*}
+$$
+
+
+## Non-stationary models
+
+It can be seen that the initialization step is linear. More especially, we have that
+$a_{z,c}=a_{x,c} + \gamma a_{y,c}$
+
+$$
+\begin{align*}
+\hat\delta_{z} &= G z \\
+&= G(x + \gamma y) \\ 
+&= Gx +\gamma Gy \\
+&= \hat\delta_x + \gamma \hat \delta_y \\
+a_{z, c} &= a_{z} - A \hat \delta_z \\
+&= a_{x}+  \gamma a_{y} - A (\hat\delta_x + \gamma \hat\delta_y)\\
+&= a_{x} - A \hat\delta_x + \gamma a_{y} - \gamma A \hat\delta_y\\
+&= a_{x, c} + \gamma a_{y,c}\\
+\end{align*}
+$$
+The discussion on stationary models can then be exactly reused after the collapsing step.

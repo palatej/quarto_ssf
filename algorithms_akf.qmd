@@ -29,15 +29,21 @@ E_t &= X_t - Z_t A_t = Z_t (B_t - A_t) \\
 {X_L}_t &= (Z_t B_t - Z_t A_t) / \sqrt f_t \\
 A_{t+1} &= T_t A_t + \tilde{K_t} {X_L}_t \quad \text{, with }A_0 = 0 
 \end{align*}
-$$ Equivalently, we can use the following recursions
+$$
+
+Equivalently, we can use the following recursions
 
 $$
 \begin{align*}
-\tilde{A_o} &= B_0 \\
+\tilde{A_o} &= B \\
 \tilde{E_t} &= 0 -  Z_t \tilde A_t \\
 \tilde {X_L}_t &= ( - Z_t \tilde A_t) / \sqrt f_t \\
 \tilde A_{t+1} &= T_t \tilde A_t + \tilde{K_t} \tilde{X_L}_t
 \end{align*}
+$$ Obviously, we have that
+
+$$
+\tilde A_{t+1} = L_t \tilde A_t = L_t \cdots L_0 B
 $$
 
 We can easily check by induction that:
@@ -150,7 +156,7 @@ S^{-1} s = (AA')^{-1} A b' = A'^{-1}b'
 \end{align*}
 $$
 
-The ml estimator of $\delta$ is then $bA^{-1}$, its variance $\Psi= S^{-1}$ s  and the ml estimator of $\sigma^2$ is $c^2/n$
+The ml estimator of $\delta$ is then $bA^{-1}$, its variance $\Psi= S^{-1}$ s and the ml estimator of $\sigma^2$ is $c^2/n$
 
 ### Collapsing
 
@@ -165,40 +171,59 @@ $$
 
 ## Smoothing
 
-### Computation of the smoothations
+We use in the smoothing algorithms the following matrices (as defined elsewhere).
 
 $$ 
 \begin{align*}
 K_t &= T_t P_t Z_t' {f_t}^{-1} \\
-\tilde e_t &=  f_t^{-1}e_t - K_t'r_t \\
-\tilde E_t &=  f_t^{-1}E_t - K_t'R_t \\
-var(\tilde e_t) &= f_t^{-1} + K_t' N_t K_t \\
-var(\tilde E_t) &= f_t^{-1} + K_t' N_t K_t \\
+L_t &= T_t - K_t Z_t'\\
 \end{align*}
-$$
+$$ \### Non collapsing case
 
-### Main recursions
+We consider first the smoothing algorithm in the "non collapsed" case. It contains several steps, detailed hereafter.
+
+#### Compact form
 
 $$ 
 \begin{align*}
-r_{t-1}' &= \tilde e_t Z_t + r_t' T_t \\
-R_{t-1}' &= \tilde E_t Z_t + R_t' T_t \\
-L_t &= T_t - K_t Z_t \\
-N_{t-1} &= Z_t' f_t^{-1} Z_t + L_t' N_t L_t 
+r_{t-1} &=  Z'_t F_t^{-1}e_t + L_t'r_t \\
+R_{t-1} &=  Z'_t F_t^{-1}E_t + L_t'R_t \\
+N_{t-1} &=  Z'_t F_t^{-1}Z_t + L_t'N_t L_t \\
+r_{c_t} &=  r_t + R_t \hat\delta \\
+N_{c_t} &=  N_t - R_t \hat\Psi R'_t
 \end{align*}
 $$
 
-### Update of the state
+#### "Verbose" form
 
 $$ 
 \begin{align*}
-&\text{using } B_t = A_t + P_t R_{t-1} \\
-\hat \delta &= E(\delta \vert y) = S^{-1}s\\
-\Psi &= var(\delta \vert y) = S^{-1} \\
-\tilde a_t &= a_t + P_t r_{t-1} + B_t \hat \delta \\
-\tilde P_t &= P_t - P_t N_{t-1} P_t +B_t \Psi B_t'
+u_t &=   F_t^{-1}e_t + K_t'r_t \\
+var(u_t) &=   F_t^{-1}e_t + K_t'N_t K_t \\
+r_{t-1} &=Z' u_t + T_t' r_t \\
+U_t &=   F_t^{-1}E_t - K_t'R_t \\
+R_{t-1} &= Z_t' U_t + T_t' R_t \\
+N_{t-1} &= Z_t' F_t^{-1} Z_t + L_t' N_t L_t 
+\end{align*}
+$$ \#### Update of the state
+
+$$ 
+\begin{align*}
+\hat \delta = E(\delta \vert y) &= -S^{-1}s \\
+\Psi = var(\delta \vert y) & = S^{-1} \\
 \end{align*}
 $$
+
+Notation: $B_t = A_t + P_t R_{t-1}$
+
+$$
+\begin{align*}
+E(a \vert y) &= a_t + P_t r_{t-1} + B_t \hat \delta = a_t + A_t\hat \delta + P_t (r_{t-1} + R_{t-1} \hat \delta)\\
+var(a \vert y) &= P_t - P_t N_{t-1} P_t + B_t \Psi B_t'
+\end{align*}
+$$
+
+Notation: $C_t= P_t(R_{t-1} + N_{t-1} A_t )$
 
 ### Update of the state in the case of collapsing in $m$
 
@@ -207,10 +232,20 @@ $$
 \hat \delta = E(\delta \vert y) &= S^{-1}(s + A'_m r_{m-1}) \\
 \Psi = var(\delta \vert y) & = S^{-1} - S^{-1}(A_m' N_{m-1} A_m)S^{-1} \\
 \end{align*}
-$$ $$ 
+$$ $$
 \begin{align*}
-C_t &= P_t(R_{t-1} + N_{t-1} A_t) \\
 \tilde a_t &= a_t + P_t r_{t-1} + B_t \hat \delta \\
 \tilde P_t &= P_t - P_t N_{t-1} P_t + B_t \Psi B_t'- B_t S^{-1} C'_t - C_t S^{-1} B'_t
+\end{align*}
+$$ \### Update of the state without collapsing
+
+In that case, it can easily be shown by recursion that $C_t = 0$ because $N_{t-1} A_t = -R_{t-1}$
+
+$$ 
+\begin{align*}
+\hat \delta &= E(\delta \vert y) = S^{-1}s\\
+\Psi &= var(\delta \vert y) = S^{-1}\\
+\tilde a_t &= a_t + P_t r_{t-1} + B_t \hat \delta \\
+\tilde P_t &= P_t - P_t N_{t-1} P_t +B_t \Psi B_t' 
 \end{align*}
 $$

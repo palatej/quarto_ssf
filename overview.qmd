@@ -6,28 +6,32 @@ title: "Overview"
 
 The `general linear gaussian` state-space model can be written in many different ways. The form considered in JD+ ($\ge 3.0$) is presented below:
 
+Measurement equation:
+
 $$ y_t = Z_t \alpha_t + \epsilon_t,\quad \epsilon_t \sim N\left(0, \sigma^2 H_t\right),\quad t> 0$$
 
-$$ \alpha_{t+1} = T_t \alpha_t + \mu_t, \quad \mu_t \sim N \left(0, \sigma^2 V_t \right),\quad t \ge 0 $$
+Transition equation:
 
-$y_t$ is the observation at period t, $\alpha_t$ is the state vector. $\epsilon_t, \mu_t$ are assumed to be serially independent at all leads and lags and independent from each other.\
-In the case of multi-variate models, $y_t$ is a vector of observations. However, in most cases, we will use the univariate approach by considering the observations one by one (univariate handling of multi-variate models).
+$$ \alpha_{t+1} = T_t \alpha_t + \nu_t, \quad \nu_t \sim N \left(0, \sigma^2 V_t \right),\quad t \ge 0 $$
+
+$y_t$ is the observation at period t, $\alpha_t$ is the state vector. $\epsilon_t, \nu_t$ are assumed to be serially independent at all leads and lags and independent from each other.\
+In the case of multivariate models, $y_t$ is a vector of observations. However, in most cases, we will use the univariate approach by considering the observations one by one, provided that $H_t$ is diagonal (univariate handling of multivariate models).
 
 The innovations of the state equation will be modeled as
 
-$$ \mu_t = S_t \xi_t, \quad \xi_t \sim N\left( 0, \sigma^2 I\right) $$
+$$ \nu_t = S_t \xi_t, \quad \xi_t \sim N\left( 0, \sigma^2 I\right) $$
 
 In other words, $V_t=S_t S_t'$
 
+It should be noted that all the indexes of arrays or matrices start at $0$ (Java and C++ convention).
+
 The initial ($\equiv t=0$) conditions of the filter are defined as follows:
 
-$$ \alpha_{0} = b + B\delta + \mu_{0}$$
+$$ \alpha_{0} = b + B\delta + \mu$$
 
-$\delta$ is unknown or $\delta \sim N\left(0, \kappa \sigma^2 I \right)$, where $\kappa$ is arbitrary large. $\mu_{0} \sim N\left(0, \sigma^2 P_*\right)$. So, $P_*$ is the variance of the stationary part of the initial state vector and $B$, which must be a full rank matrix, models the diffuse part. We write $BB'=P_\infty$. It should be noted that applying an orthogonal transformation to $B$ or multiplying it by a constant will give exactly the same initialization. Moreover, when the initial state is completely diffuse, $\mu_0$ is not relevant and it can be safely considered as $0$. Finally, it should be noted that imposing that the covariance of $\delta$ is proportional to $I$ is not an actual restriction: in the hypothesis of a more general non singular matrix, we just should pre-multiply $\delta$ by the inverse of the Cholesky factor of that matrix and post-multiply $B$ by that factor to get an equivalent initialization.
+$\delta$ is fixed but unknown or $\delta \sim N\left(0, \kappa \sigma^2 I \right)$, where $\kappa$ is arbitrary large. $\mu\sim N\left(0,\sigma^2 P_*\right)$. So, $P_*$ is the variance of the stationary part of the initial state vector and $B$, which must be a full rank matrix, models the diffuse part. We write $BB'=P_\infty$. It should be noted that applying an orthogonal transformation to $B$ or multiplying it by a constant will give exactly the same initialization. Moreover, when the initial state is completely diffuse, $\mu$ is not relevant and it can be safely considered as $0$. Finally, it should be noted that imposing that the covariance of $\delta$ is proportional to $I$ is not an actual restriction: in the hypothesis of a more general non singular matrix, we just should pre-multiply $\delta$ by the inverse of the Cholesky factor of that matrix and post-multiply $B$ by that factor to get an equivalent initialization.
 
-In the sequel, we will call "stationary models", the models with a simple initialization (\$a_0 = u_0\$) and "diffuse models" (even when $\delta$ are considered as fixed unknown parameters), the models with the general starting conditions.
-
-The definition used in JD+ is quasi-identical to that of Durbin and Koopman\[1\].
+In the sequel, we will call "stationary models", the models with a simple initialization ( $\alpha_0=\mu$ ) and "diffuse models" (even when $\delta$ are considered as fixed unknown parameters), the models with the general starting conditions.
 
 In summary, apart from the scaling factor $\sigma^2$ which can be given or estimated, the model is completely defined by the following quantities (possible default values are indicated in brackets):
 
@@ -37,13 +41,22 @@ $$ \mathbf{T_t}, \mathbf{V_t} [=S_t S_t'], \mathbf{S_t} [=Cholesky(V)] $$
 
 $$ \mathbf{b}[=0], \mathbf{P_*} [=0], \mathbf{B} [=0], \mathbf{P_\infty} [=BB'] $$
 
-It should be noted that all the indexes of arrays or matrices start at $0$ (Java and C++ convention). The following notations are also used in all the pages related to the ssf framework:
+The following notations are also used in all the pages related to the ssf framework:
 
 $$ a_{t+k|t}=E\left(\alpha_{t+k} | y_0 \cdots y_{t}\right)$$
 
 $$ P_{t+k|t}=cov\left(\alpha_{t+k} | y_0 \cdots y_{t}\right)$$
 
-$$ a_{t+1}=a_{t+1|t}, \: P_{t+1}=P_{t+1|t} $$ $$ 
+$$ a_{t+1}=a_{t+1|t}, \: P_{t+1}=P_{t+1|t} $$
+
+The definition used in JD+ is quasi-identical to that of Durbin and Koopman\[1\].
+
+In the literature, richer forms of state space models are considered: models with regression variables in the measurement and/or in the transition equations, common modeling of the measurement and transition innovations...
+All those features can be integrated in the framework of JD+, for instance by integrating regression coefficients or innovations in the state array. The price of such an approach is a significant decrease of efficiency. However, the specific design of the framework mitigates most of that cost. So, we have preferred simpler algorithms, which can be understood and maintained more easily. 
+
+
+
+$$ 
 \begin{align*}
 y_t - E(y_t| y_0 \cdots y_t-1) &= e_t \\
 var(e_t) &= f_t \\
