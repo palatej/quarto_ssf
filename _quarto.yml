@@ -22,7 +22,7 @@ book:
     - part: ssf_algorithms.qmd
       chapters: 
         - algorithms_ordinary.qmd
-        - algorithms_chandrasekhar.qmd
+        - algorithms_ckms.qmd
         - algorithms_array.qmd
         - algorithms_akf.qmd
         - algorithms_dk.qmd

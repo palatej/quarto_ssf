@@ -1,0 +1,47 @@
+---
+title: "CKMS filters"
+---
+
+Most of the routines related to the Kalman filter are indifferent to whether the matrices (or functions) depend on the time or not. The CKMS (Chandrasekar - Kailath - Morf - Sidhu) filters are designed for time-invariant system and lead to significant faster solutions. Basically, they propagate the increments of the covariance of the state arrays, instead of calculating them completely. We describe below the fast CKMS recursions.
+
+## Fast CKMS recursions
+
+We define $\delta P_t= P_{t+1}-P_t$
+
+It can be shown that $\delta P_i = L_i M_i L_i'$
+
+### General recursions
+
+$$
+\begin{align*}
+K_{t+1} &= K_t - T L_t R_t^{-1} L_t'Z'\\
+L_{t+1} &= T L_t - K_t F_t^{-1} Z L_t\\
+F_{t+1} &= F_t - Z L_t R_t^{-1} L_t' Z'\\
+R_{t+1} &= R_t - L_t' Z' F_t^{-1} Z L_t'\\
+e_t &= y_t - Z_t a_t \\
+a_{t+1} &= T_t a_t + K_t e_t \\
+\end{align*}
+$$
+
+### Univariate model
+
+In the univariate case, R and F are scalars and the recursions, based on $M_t$ instead of $K_t=TM_t f_t^{-1}$ are simpler
+
+$$
+\begin{align*}
+f_t &= r_t \\
+\mu_t & \triangleq Z L_t  \\
+\nu_t & \triangleq \mu_t f_t^{-1} \\
+M_{t+1} &= M_t - L_t \nu_t \\
+L_{t+1} &= T (L_t - M_t \nu_t) \\
+f_{t+1} &= f_t - \mu_t \nu_t \\
+e_t &= y_t - Z_t a_t \\
+a_{t+1} &= T_t (a_t + M_t e_tf_t^{-1})\\
+\end{align*}
+$$ \### Implementation
+
+The CKMS filter is implemented in the classes `jdplus.toolkit.base.core.ssf.ckms.CkmsFilter` and `jdplus.toolkit.base.core.ssf.multivariate.MultivariateOrdinaryFilter`.
+
+## Bibliography
+
+KAILATH T., SAYED A.H. AND HASSIBI B. (2000): "Linear Estimation". Prentice Hall.
