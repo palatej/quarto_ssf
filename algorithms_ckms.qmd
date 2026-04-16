@@ -6,26 +6,45 @@ Most of the routines related to the Kalman filter are indifferent to whether the
 
 ## Fast CKMS recursions
 
-We define $\delta P_t= P_{t+1}-P_t$
+We define $\delta P_t \triangleq P_{t+1}-P_t$.
 
-It can be shown that $\delta P_i = L_i M_i L_i'$
+As $\Delta P_0$ is symmetric, we have that $\Delta P_0 = L_0 R_0^{-1} L_0'$ (using for instance the Bunch-Kaufman algorithm)
 
 ### General recursions
 
 $$
 \begin{align*}
-K_{t+1} &= K_t - T L_t R_t^{-1} L_t'Z'\\
-L_{t+1} &= T L_t - K_t F_t^{-1} Z L_t\\
+G_t &\triangleq T P_t Z' \\
+G_{t+1} &= G_t - T L_t R_t^{-1} L_t'Z'\\
+L_{t+1} &= T L_t - G_t F_t^{-1} Z L_t\\
+F_{t+1} &= F_t - Z L_t R_t^{-1} L_t' Z'\\
+R_{t+1} &= R_t - L_t' Z' F_t^{-1} Z L_t'\\
+e_t &= y_t - Z a_t \\
+a_{t+1} &= T a_t + G_t F_t^{-1} e_t \\
+\end{align*}
+$$ or, equivalently,
+
+$$
+\begin{align*}
+M_t &\triangleq P_t Z' \\
+M_{t+1} &= M_t - L_t R_t^{-1} L_t'Z'\\
+L_{t+1} &= T (L_t - M_t F_t^{-1} Z L_t)\\
 F_{t+1} &= F_t - Z L_t R_t^{-1} L_t' Z'\\
 R_{t+1} &= R_t - L_t' Z' F_t^{-1} Z L_t'\\
 e_t &= y_t - Z_t a_t \\
-a_{t+1} &= T_t a_t + K_t e_t \\
+a_{t+1} &= T_t (a_t + M_t F_t^{-1}e_t) \\
 \end{align*}
-$$
+$$ \### Initialization
+
+In the case of stationary models with unconditional initialization, we have that $T P_0 T' + V_0 = P_0$. So, $\Delta P_0 = - G_0 F_0^{-1} G_0'$ and the initialization is immediate.
+
+When $P_0 = 0$, $\Delta P_0 = V_0 = S_0 S_0'$ and the initiatialization is defined by $S_0 I S_0'$
+
+#### Special cases
 
 ### Univariate model
 
-In the univariate case, R and F are scalars and the recursions, based on $M_t$ instead of $K_t=TM_t f_t^{-1}$ are simpler
+In the univariate case, R and F are scalars and the recursions are simpler
 
 $$
 \begin{align*}
@@ -44,4 +63,4 @@ The CKMS filter is implemented in the classes `jdplus.toolkit.base.core.ssf.ckms
 
 ## Bibliography
 
-KAILATH T., SAYED A.H. AND HASSIBI B. (2000): "Linear Estimation". Prentice Hall.
+KAILATH T., SAYED A.H. AND HASSIBI B. (2000): "Linear Estimation". Prentice Hall. Chapter 11.
